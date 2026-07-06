@@ -195,7 +195,7 @@
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div class="login-err" id="loginErr"></div>
-        <div class="login-foot">🔒 Защищено Firebase Auth</div>
+        <div class="login-foot">🔒 Данные хранятся в РФ · Yandex Cloud</div>
       </div>
     </div>
   </div>
@@ -247,29 +247,29 @@
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, setDoc, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getMessaging, getToken, onMessage }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+const API_URL = 'https://functions.yandexcloud.net/d4eeoorunareer57v93t';
+let authToken = localStorage.getItem('alga_token') || null;
+let authEmail = localStorage.getItem('alga_email') || null;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyArhh8lUUpDOQXgYMIZgzt-E3fjCsHs3v8",
-  authDomain: "alga-booking.firebaseapp.com",
-  projectId: "alga-booking",
-  storageBucket: "alga-booking.firebasestorage.app",
-  messagingSenderId: "344302117820",
-  appId: "1:344302117820:web:7a36b0c06d6d13786881b9"
-};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+async function api(action, { method = 'GET', body } = {}) {
+  const r = await fetch(`${API_URL}?action=${action}`, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...(authToken ? { 'X-Alga-Token': authToken } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (r.status === 401 && action !== 'login') { setAuth(null, null); showLogin(); throw new Error('unauthorized'); }
+  if (!r.ok) throw new Error('api ' + r.status);
+  return r.json();
+}
+function setAuth(token, email) {
+  authToken = token; authEmail = email;
+  if (token) { localStorage.setItem('alga_token', token); localStorage.setItem('alga_email', email); }
+  else { localStorage.removeItem('alga_token'); localStorage.removeItem('alga_email'); }
+}
 
 const $ = (id) => document.getElementById(id);
 const loginScreen = $('loginScreen'), panel = $('panel');
-let allBookings = [], byId = {}, unsub = null, firstLoad = true, audioCtx = null;
+let allBookings = [], byId = {}, pollTimer = null, knownIds = null, audioCtx = null;
 
 const overlay = $('modalOverlay'), modalBox = $('modalBox'), ptr = $('ptr');
 document.body.appendChild(overlay);
@@ -283,23 +283,19 @@ const STATUS = {
   cancel:   { label:'Отменена',     cls:'st-cancel',   dot:'#c2453d' }
 };
 
-const VAPID_KEY = "BOkB9gyPoqQh2LF3mF_WofPJd2_s2NxqiSXyAOzdueYi6T0QLv25pCOwF9XnKVF-pVGB-EJiWARXGSE9XrQopho";
-let messaging = null;
-
 async function enablePush() {
   try {
-    if (!('serviceWorker' in navigator) || !auth.currentUser) return;
-    if (!VAPID_KEY || VAPID_KEY.indexOf('ВСТАВЬ') === 0) return;
-    const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js');
-    messaging = getMessaging(app);
-    const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
-    if (token) {
-      const safeId = auth.currentUser.email.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      await setDoc(doc(db, 'push_tokens', safeId),
-        { token, email: auth.currentUser.email, ts: serverTimestamp() });
-    }
-    onMessage(messaging, () => beep());
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !authToken) return;
+    const reg = await navigator.serviceWorker.register('sw.js');
+    const { key } = await api('vapid');
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+    await api('subscribe', { method: 'POST', body: { subscription: sub.toJSON() } });
   } catch (e) { console.error('push:', e); }
+}
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'alga-push') { beep(); refreshData(); }
+  });
 }
 
 $('bellBtn').addEventListener('click', async () => {
@@ -337,44 +333,54 @@ function notifyNew(b) {
 
 $('loginBtn').addEventListener('click', doLogin);
 $('adminPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
-function doLogin() {
+async function doLogin() {
   try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch(e){}
   $('loginErr').textContent = '';
   $('loginBtn').disabled = true;
-  signInWithEmailAndPassword(auth, $('adminEmail').value.trim(), $('adminPass').value)
-    .catch((err) => {
-      const map = { 'auth/invalid-credential':'Неверный email или пароль', 'auth/invalid-email':'Некорректный email', 'auth/too-many-requests':'Слишком много попыток, подождите' };
-      $('loginErr').textContent = map[err.code] || 'Ошибка входа';
-    })
-    .finally(() => { $('loginBtn').disabled = false; });
-}
-$('logoutBtn').addEventListener('click', () => signOut(auth));
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    loginScreen.classList.add('hidden'); panel.classList.remove('hidden');
-    $('userEmail').textContent = user.email;
-    if ('Notification' in window && Notification.permission === 'granted') { $('bellBtn').classList.add('on'); enablePush(); }
-    firstLoad = true; subscribe();
-  } else {
-    if (unsub) { unsub(); unsub = null; }
-    panel.classList.add('hidden'); loginScreen.classList.remove('hidden'); $('adminPass').value = '';
+  try {
+    const res = await api('login', { method: 'POST', body: { email: $('adminEmail').value.trim(), password: $('adminPass').value } });
+    setAuth(res.token, res.email);
+    showPanel();
+  } catch (e) {
+    $('loginErr').textContent = 'Неверный email или пароль';
+  } finally {
+    $('loginBtn').disabled = false;
   }
+}
+$('logoutBtn').addEventListener('click', () => {
+  setAuth(null, null);
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  showLogin();
 });
 
-function subscribe() {
-  const q = query(collection(db, 'bookings'), orderBy('createdAt', 'desc'));
-  unsub = onSnapshot(q, (snap) => {
-    if (!firstLoad) { snap.docChanges().forEach((ch) => { if (ch.type === 'added') notifyNew(ch.doc.data()); }); }
-    firstLoad = false;
-    allBookings = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    byId = {}; allBookings.forEach((b) => byId[b.id] = b);
-    render();
-  }, (err) => {
-    $('list').innerHTML = '<div class="empty">Нет доступа к данным. Проверьте, что ваш email добавлен в правила Firestore.</div>';
-    console.error(err);
-  });
+function showPanel() {
+  loginScreen.classList.add('hidden'); panel.classList.remove('hidden');
+  $('userEmail').textContent = authEmail || '';
+  if ('Notification' in window && Notification.permission === 'granted') { $('bellBtn').classList.add('on'); enablePush(); }
+  knownIds = null; startPolling();
 }
+function showLogin() {
+  panel.classList.add('hidden'); loginScreen.classList.remove('hidden'); $('adminPass').value = '';
+}
+
+async function loadBookings() {
+  const res = await api('bookings');
+  const bookings = res.bookings || [];
+  if (knownIds) bookings.forEach((b) => { if (!knownIds.has(b.id)) notifyNew(b); });
+  knownIds = new Set(bookings.map((b) => b.id));
+  allBookings = bookings; byId = {}; allBookings.forEach((b) => byId[b.id] = b);
+  render();
+}
+function startPolling() {
+  loadBookings().catch((e) => {
+    if (e.message !== 'unauthorized') $('list').innerHTML = '<div class="empty">Не удалось загрузить заявки. Проверьте интернет и обновите страницу.</div>';
+  });
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(() => { if (!document.hidden && authToken) loadBookings().catch(console.error); }, 20000);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && authToken) loadBookings().catch(console.error); });
+
+if (authToken) showPanel(); else showLogin();
 
 ['searchInput','typeFilter','statusFilter'].forEach((id) => $(id).addEventListener('input', render));
 
@@ -411,7 +417,7 @@ function render() {
       this.dataset.cur = this.value;
       const rail = this.closest('.card').querySelector('.card-rail');
       if (rail) rail.style.background = STATUS[this.value].dot;
-      try { await updateDoc(doc(db, 'bookings', id), { status: this.value }); }
+      try { await api('status', { method: 'POST', body: { id, status: this.value } }); }
       catch (e) { alert('Не удалось сохранить статус'); this.value = old; this.dataset.cur = old; }
     });
   });
@@ -513,12 +519,12 @@ function openModal(id) {
   if (delBtn) delBtn.addEventListener('click', async () => {
     if (!confirm('Удалить заявку «' + (b.fio || '') + '» безвозвратно?')) return;
     delBtn.disabled = true; delBtn.textContent = 'Удаление...';
-    try { await deleteDoc(doc(db, 'bookings', id)); closeModal(); }
-    catch (e) { alert('Не удалось удалить. Проверьте правило allow delete в Firestore.'); delBtn.disabled = false; delBtn.innerHTML = delIcon + ' Удалить заявку'; }
+    try { await api('delete', { method: 'POST', body: { id } }); closeModal(); refreshData(); }
+    catch (e) { alert('Не удалось удалить заявку.'); delBtn.disabled = false; delBtn.innerHTML = delIcon + ' Удалить заявку'; }
   });
 }
 
-function refreshData() { if (unsub) { unsub(); unsub = null; } firstLoad = true; subscribe(); }
+function refreshData() { if (authToken) loadBookings().catch(console.error); }
 (function () {
   let ptrStart = null, ptrPulling = false;
   const PTR_MAX = 90, PTR_TRIG = 65;
