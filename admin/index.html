@@ -62,6 +62,9 @@
 .alga-admin .top{display:flex; justify-content:space-between; align-items:flex-start; gap:.6rem; margin-bottom:20px;}
 .alga-admin .top-title h1{font-size:21px; font-weight:700; letter-spacing:-.02em; margin:0;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.alga-admin .db-dot{display:inline-block; width:8px; height:8px; border-radius:50%; background:#c2453d;
+  margin-left:8px; vertical-align:middle; transition:background .3s, box-shadow .3s;}
+.alga-admin .db-dot.on{background:#1f9d57; box-shadow:0 0 0 3px rgba(31,157,87,.15);}
 .alga-admin .user-email{font-family:var(--mono); font-size:11px; color:var(--c-faint); margin-top:3px;
   display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px;}
 .alga-admin .user{display:flex; gap:8px; flex-shrink:0;}
@@ -122,11 +125,11 @@
 @media (max-width:560px){ .alga-admin .logout-txt{display:none;} .alga-admin .logout{padding:0; width:40px; justify-content:center;} }
 .alga-modal-overlay{position:fixed; inset:0; background:rgba(16,36,43,.5); z-index:9998;
   display:flex; align-items:flex-end; justify-content:center; opacity:0; visibility:hidden; pointer-events:none;
-  transition:opacity .25s ease, visibility 0s linear .25s;}
-.alga-modal-overlay.show{opacity:1; visibility:visible; pointer-events:auto; transition:opacity .25s ease, visibility 0s;}
+  transition:opacity .4s ease, visibility 0s linear .4s;}
+.alga-modal-overlay.show{opacity:1; visibility:visible; pointer-events:auto; transition:opacity .4s ease, visibility 0s;}
 .alga-modal{background:#fff; width:100%; max-width:480px; border-radius:24px 24px 0 0;
   padding:14px 22px 26px; max-height:90vh; overflow-y:auto; transform:translateY(100%);
-  transition:transform .3s ease; color:#10242b;
+  transition:transform .45s cubic-bezier(.32,.72,.24,1.02); color:#10242b;
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
   --mono:ui-monospace,'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;}
 .alga-modal-overlay.show .alga-modal{transform:translateY(0);}
@@ -202,7 +205,7 @@
 
   <div id="panel" class="hidden">
     <div class="top">
-      <div class="top-title"><h1>Заявки</h1><span id="userEmail" class="user-email"></span></div>
+      <div class="top-title"><h1>Заявки<span id="dbDot" class="db-dot" title="Соединение с базой данных"></span></h1><span id="userEmail" class="user-email"></span></div>
       <div class="user">
         <button class="icon-btn" id="bellBtn" title="Уведомления о новых заявках">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -363,8 +366,13 @@ function showLogin() {
   panel.classList.add('hidden'); loginScreen.classList.remove('hidden'); $('adminPass').value = '';
 }
 
+function setDbDot(ok) { const d = $('dbDot'); if (d) d.classList.toggle('on', ok); }
+
 async function loadBookings() {
-  const res = await api('bookings');
+  let res;
+  try { res = await api('bookings'); }
+  catch (e) { setDbDot(false); throw e; }
+  setDbDot(true);
   const bookings = res.bookings || [];
   if (knownIds) bookings.forEach((b) => { if (!knownIds.has(b.id)) notifyNew(b); });
   knownIds = new Set(bookings.map((b) => b.id));
@@ -448,7 +456,8 @@ function card(b) {
 }
 
 overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-function closeModal(){ overlay.classList.remove('show'); }
+let modalClosedAt = 0;
+function closeModal(){ overlay.classList.remove('show'); modalClosedAt = Date.now(); }
 window.closeAlgaModal = closeModal;
 
 let dragStartY = null, dragging = false;
@@ -531,6 +540,7 @@ function refreshData() { if (authToken) loadBookings().catch(console.error); }
   window.addEventListener('touchstart', (e) => {
     if (panel.classList.contains('hidden')) return;
     if (overlay.classList.contains('show')) return;
+    if (Date.now() - modalClosedAt < 600) return; // жест закрытия модалки не должен дёргать pull-to-refresh
     if (window.scrollY > 0) return;
     ptrStart = e.touches[0].clientY; ptrPulling = true;
   }, { passive: true });
