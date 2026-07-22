@@ -1,3 +1,5 @@
 node_modules/
 *.zip
 package-lock.json
+
+.sa-key.json
