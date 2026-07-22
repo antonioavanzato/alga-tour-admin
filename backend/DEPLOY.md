@@ -109,22 +109,29 @@ aws dynamodb create-table --endpoint "$EP" \
 
 ## 4. Значения переменных окружения
 
-Ключи VAPID и JWT уже сгенерированы для этого проекта (можно перегенерировать, см. ниже):
+⚠️ **Секреты НЕ хранятся в репозитории.** Скопируйте шаблон и впишите значения
+в локальный файл `.deploy.env` (он в `.gitignore` и никогда не коммитится):
 
-```
-VAPID_PUBLIC_KEY   = BMkHwgzjJDP1yvJje0J56oYhe60YdZNxpsYWLUVI8oxsW-a-a_0wilwhKOKFMFPuTd0pKo5jkh8oaAwRQEa_ipI
-VAPID_PRIVATE_KEY  = L7rxtWJXWAB0q5LTJFJjT_U9N_L1o1_Q6TB3Kn5QfaY
-VAPID_SUBJECT      = mailto:algatours@yahoo.com
-JWT_SECRET         = 1e3d2cdf3667b8e3804b0f0b44f5b89fe5b830c3bf61379da68a512782ecf656
-INTAKE_SECRET      = Alga2026!
-BOT_TOKEN          = 8486028744:AAE4ngWmqb16UR4bgG-dvIGdKJ8tem11zJU
-CHAT_IDS           = -1003526797295
-ADMIN_EMAILS       = antonioavanzato@gmail.com,Ymilia@ya.ru,algatours@yahoo.com
-ADMIN_PASSWORD     = MaldivesLive2026!
+```bash
+cp .deploy.env.example .deploy.env
+# затем откройте .deploy.env и впишите реальные значения
 ```
 
-> Перегенерировать VAPID/JWT при необходимости:
-> `node backend/gen-keys.js`
+Список переменных (что это и откуда взять) — в `.deploy.env.example`:
+
+| Переменная         | Что это                                                            |
+|--------------------|-------------------------------------------------------------------|
+| `INTAKE_SECRET`    | секретный ключ формы (совпадает с `SECRET_KEY` в коде формы)       |
+| `BOT_TOKEN`        | токен Telegram-бота (от @BotFather)                               |
+| `CHAT_IDS`         | ID канала/чата для уведомлений                                     |
+| `ADMIN_EMAILS`     | почты админов через запятую                                        |
+| `ADMIN_PASSWORD`   | общий пароль входа в админку                                       |
+| `JWT_SECRET`       | случайный секрет для подписи токенов (`node gen-keys.js`)          |
+| `VAPID_PUBLIC_KEY` | публичный ключ Web Push (`node gen-keys.js`)                       |
+| `VAPID_PRIVATE_KEY`| приватный ключ Web Push (`node gen-keys.js`)                       |
+| `VAPID_SUBJECT`    | `mailto:` контакт для Web Push                                     |
+
+> Сгенерировать `JWT_SECRET` и пару `VAPID_*`: `node backend/gen-keys.js`
 > Если поменяете `VAPID_PUBLIC_KEY` — старые подписки в браузерах перестанут работать,
 > админам нужно будет заново нажать «колокольчик».
 
@@ -132,56 +139,31 @@ ADMIN_PASSWORD     = MaldivesLive2026!
 
 ## 5. Задеплоить функции
 
-Каждая функция — отдельная папка с `index.js` + `package.json`. Yandex сам ставит
-зависимости из `package.json` при сборке версии.
+Проще всего — одной командой: `./deploy.sh` (он читает секреты из `.deploy.env`,
+создаёт/обновляет функции, ставит публичный доступ и инициализирует таблицы).
 
-### intake
+Вручную каждая функция деплоится так (секреты подставляются из окружения `.deploy.env`,
+их **не пишут в открытом виде** в команды):
 
 ```bash
 cd backend/intake
 zip -r ../intake.zip index.js package.json
 
 yc serverless function version create \
-  --function-id d4e0j71rtc9q7026rsc3 \
-  --runtime nodejs22 \
-  --entrypoint index.handler \
-  --memory 256m \
-  --execution-timeout 30s \
-  --source-path ../intake.zip \
-  --service-account-id $SA_ID \
-  --environment YDB_DOCUMENT_ENDPOINT=<EP> \
-  --environment YC_ACCESS_KEY_ID=<key_id> \
-  --environment YC_SECRET_ACCESS_KEY=<secret> \
-  --environment INTAKE_SECRET='Alga2026!' \
-  --environment BOT_TOKEN='8486028744:AAE4ngWmqb16UR4bgG-dvIGdKJ8tem11zJU' \
-  --environment CHAT_IDS='-1003526797295' \
-  --environment VAPID_PUBLIC_KEY='BMkHwgzjJDP1yvJje0J56oYhe60YdZNxpsYWLUVI8oxsW-a-a_0wilwhKOKFMFPuTd0pKo5jkh8oaAwRQEa_ipI' \
-  --environment VAPID_PRIVATE_KEY='L7rxtWJXWAB0q5LTJFJjT_U9N_L1o1_Q6TB3Kn5QfaY' \
-  --environment VAPID_SUBJECT='mailto:algatours@yahoo.com'
+  --function-id <INTAKE_FN_ID> \
+  --runtime nodejs22 --entrypoint index.handler --memory 256m --execution-timeout 30s \
+  --source-path ../intake.zip --service-account-id $SA_ID \
+  --environment YDB_DOCUMENT_ENDPOINT="$EP" \
+  --environment YC_ACCESS_KEY_ID="$AK" --environment YC_SECRET_ACCESS_KEY="$SK" \
+  --environment INTAKE_SECRET="$INTAKE_SECRET" \
+  --environment BOT_TOKEN="$BOT_TOKEN" --environment CHAT_IDS="$CHAT_IDS" \
+  --environment VAPID_PUBLIC_KEY="$VAPID_PUBLIC_KEY" \
+  --environment VAPID_PRIVATE_KEY="$VAPID_PRIVATE_KEY" \
+  --environment VAPID_SUBJECT="$VAPID_SUBJECT"
 ```
 
-### admin-api
-
-```bash
-cd ../admin-api
-zip -r ../admin-api.zip index.js package.json
-
-yc serverless function version create \
-  --function-id d4eeoorunareer57v93t \
-  --runtime nodejs22 \
-  --entrypoint index.handler \
-  --memory 256m \
-  --execution-timeout 30s \
-  --source-path ../admin-api.zip \
-  --service-account-id $SA_ID \
-  --environment YDB_DOCUMENT_ENDPOINT=<EP> \
-  --environment YC_ACCESS_KEY_ID=<key_id> \
-  --environment YC_SECRET_ACCESS_KEY=<secret> \
-  --environment JWT_SECRET='1e3d2cdf3667b8e3804b0f0b44f5b89fe5b830c3bf61379da68a512782ecf656' \
-  --environment ADMIN_EMAILS='antonioavanzato@gmail.com,Ymilia@ya.ru,algatours@yahoo.com' \
-  --environment ADMIN_PASSWORD='MaldivesLive2026!' \
-  --environment VAPID_PUBLIC_KEY='BMkHwgzjJDP1yvJje0J56oYhe60YdZNxpsYWLUVI8oxsW-a-a_0wilwhKOKFMFPuTd0pKo5jkh8oaAwRQEa_ipI'
-```
+admin-api — аналогично, с переменными `JWT_SECRET`, `ADMIN_EMAILS`, `ADMIN_PASSWORD`,
+`VAPID_PUBLIC_KEY` (см. `deploy.sh`).
 
 ---
 
@@ -190,30 +172,31 @@ yc serverless function version create \
 Форма и админка вызывают функции без авторизации Yandex — нужен публичный доступ:
 
 ```bash
-yc serverless function allow-unauthenticated-invoke --id d4e0j71rtc9q7026rsc3
-yc serverless function allow-unauthenticated-invoke --id d4eeoorunareer57v93t
+yc serverless function allow-unauthenticated-invoke --id <INTAKE_FN_ID>
+yc serverless function allow-unauthenticated-invoke --id <ADMIN_FN_ID>
 ```
 
 ---
 
 ## 7. Проверка
 
-**intake** (должен вернуть `403 Forbidden` без ключа и `200 OK` с ключом):
+**intake** (без ключа `403`, с ключом `200`):
 
 ```bash
-curl -i -X POST https://functions.yandexcloud.net/d4e0j71rtc9q7026rsc3 \
-  -d 'key=Alga2026!&fio=Тест&phone=+79990000000&service_type=excursion&excursion=АКВАРИУМ&excursion_date=2026-08-01&people_count=2&departure_island=Мале'
+curl -i -X POST https://functions.yandexcloud.net/<INTAKE_FN_ID> \
+  --data-urlencode "key=$INTAKE_SECRET" --data-urlencode 'fio=Тест' \
+  --data-urlencode 'phone=+79990000000' --data-urlencode 'service_type=excursion' \
+  --data-urlencode 'excursion=АКВАРИУМ' --data-urlencode 'excursion_date=2026-08-01' \
+  --data-urlencode 'people_count=2' --data-urlencode 'departure_island=Мале'
 ```
-
-После этого должно прийти сообщение в Telegram-канал и появиться заявка в админке.
 
 **admin-api** (логин):
 
 ```bash
-curl -s -X POST 'https://functions.yandexcloud.net/d4eeoorunareer57v93t?action=login' \
+curl -s -X POST 'https://functions.yandexcloud.net/<ADMIN_FN_ID>?action=login' \
   -H 'Content-Type: application/json' \
-  -d '{"email":"algatours@yahoo.com","password":"MaldivesLive2026!"}'
-# → {"token":"…","email":"algatours@yahoo.com"}
+  -d '{"email":"<почта-админа>","password":"<пароль>"}'
+# → {"token":"…","email":"…"}
 ```
 
 ---

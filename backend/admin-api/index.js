@@ -17,7 +17,7 @@
  * Админка на другом домене → нужны CORS-заголовки на каждом ответе.
  */
 
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBClient, CreateTableCommand, ListTablesCommand } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand, ScanCommand, UpdateCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 const jwt = require('jsonwebtoken');
 
@@ -120,6 +120,22 @@ async function subscribe(body, auth) {
   return json(200, { ok: true });
 }
 
+// одноразовая инициализация таблиц Document API (защищено JWT_SECRET)
+const rawClient = new DynamoDBClient({
+  region: 'ru-central1', endpoint: YDB_DOCUMENT_ENDPOINT,
+  credentials: { accessKeyId: YC_ACCESS_KEY_ID, secretAccessKey: YC_SECRET_ACCESS_KEY },
+});
+async function initTables() {
+  const existing = new Set(((await rawClient.send(new ListTablesCommand({}))).TableNames) || []);
+  const specs = [
+    { TableName: BOOKINGS_TABLE, KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }], AttributeDefinitions: [{ AttributeName: 'id', AttributeType: 'S' }] },
+    { TableName: SUBS_TABLE, KeySchema: [{ AttributeName: 'endpoint', KeyType: 'HASH' }], AttributeDefinitions: [{ AttributeName: 'endpoint', AttributeType: 'S' }] },
+  ];
+  const created = [];
+  for (const s of specs) { if (!existing.has(s.TableName)) { await rawClient.send(new CreateTableCommand(s)); created.push(s.TableName); } }
+  return json(200, { ok: true, created, existing: [...existing] });
+}
+
 // ── handler ─────────────────────────────────────────────────────────
 module.exports.handler = async (event) => {
   const method = (event.httpMethod || 'GET').toUpperCase();
@@ -130,6 +146,10 @@ module.exports.handler = async (event) => {
   const body = method === 'POST' ? parseBody(event) : {};
 
   try {
+    if (action === 'init') {
+      if (getHeader(event, 'X-Init-Secret') !== JWT_SECRET) return json(403, { error: 'forbidden' });
+      return await initTables();
+    }
     if (action === 'login') return await login(body);
     if (action === 'vapid') return json(200, { key: VAPID_PUBLIC_KEY });
 

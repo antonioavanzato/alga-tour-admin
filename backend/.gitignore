@@ -1,5 +1,9 @@
 node_modules/
 *.zip
 package-lock.json
-
+# секреты и ключи — НИКОГДА не коммитить
+.deploy.env
+*key*.json
 .sa-key.json
+.sa-key-auth.json
+.static-key.json

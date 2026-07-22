@@ -19,16 +19,19 @@ FOLDER_ID="${FOLDER_ID:-b1gpnarkgmscmsjq3pu7}"
 INTAKE_FN_ID="${INTAKE_FN_ID:-d4e0j71rtc9q7026rsc3}"
 ADMIN_FN_ID="${ADMIN_FN_ID:-d4eeoorunareer57v93t}"
 
-# ── секреты/значения (можно переопределить через env) ────────────────
-INTAKE_SECRET="${INTAKE_SECRET:-Alga2026!}"
-BOT_TOKEN="${BOT_TOKEN:-8486028744:AAE4ngWmqb16UR4bgG-dvIGdKJ8tem11zJU}"
-CHAT_IDS="${CHAT_IDS:--1003526797295}"
-ADMIN_EMAILS="${ADMIN_EMAILS:-antonioavanzato@gmail.com,Ymilia@ya.ru,algatours@yahoo.com}"
-ADMIN_PASSWORD="${ADMIN_PASSWORD:-MaldivesLive2026!}"
-JWT_SECRET="${JWT_SECRET:-1e3d2cdf3667b8e3804b0f0b44f5b89fe5b830c3bf61379da68a512782ecf656}"
-VAPID_PUBLIC_KEY="${VAPID_PUBLIC_KEY:-BMkHwgzjJDP1yvJje0J56oYhe60YdZNxpsYWLUVI8oxsW-a-a_0wilwhKOKFMFPuTd0pKo5jkh8oaAwRQEa_ipI}"
-VAPID_PRIVATE_KEY="${VAPID_PRIVATE_KEY:-L7rxtWJXWAB0q5LTJFJjT_U9N_L1o1_Q6TB3Kn5QfaY}"
-VAPID_SUBJECT="${VAPID_SUBJECT:-mailto:algatours@yahoo.com}"
+# ── секреты/значения загружаются из локального .deploy.env ───────────
+# (см. .deploy.env.example; файл .deploy.env в .gitignore и не коммитится)
+if [ -f .deploy.env ]; then set -a; . ./.deploy.env; set +a; fi
+
+: "${INTAKE_SECRET:?Задайте INTAKE_SECRET в backend/.deploy.env (см. .deploy.env.example)}"
+: "${BOT_TOKEN:?Задайте BOT_TOKEN в backend/.deploy.env}"
+: "${CHAT_IDS:?Задайте CHAT_IDS в backend/.deploy.env}"
+: "${ADMIN_EMAILS:?Задайте ADMIN_EMAILS в backend/.deploy.env}"
+: "${ADMIN_PASSWORD:?Задайте ADMIN_PASSWORD в backend/.deploy.env}"
+: "${JWT_SECRET:?Задайте JWT_SECRET в backend/.deploy.env}"
+: "${VAPID_PUBLIC_KEY:?Задайте VAPID_PUBLIC_KEY в backend/.deploy.env}"
+: "${VAPID_PRIVATE_KEY:?Задайте VAPID_PRIVATE_KEY в backend/.deploy.env}"
+: "${VAPID_SUBJECT:=mailto:admin@example.com}"
 
 yc() { command yc --folder-id "$FOLDER_ID" "$@"; }
 say() { printf '\n\033[1;36m▶ %s\033[0m\n' "$*"; }
