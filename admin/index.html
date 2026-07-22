@@ -250,7 +250,7 @@
 </div>
 
 <script type="module">
-const API_URL = 'https://functions.yandexcloud.net/d4eeoorunareer57v93t';
+const API_URL = 'https://functions.yandexcloud.net/d4ed9gsamgdaflofq6jj';
 let authToken = localStorage.getItem('alga_token') || null;
 let authEmail = localStorage.getItem('alga_email') || null;
 
@@ -384,7 +384,7 @@ function startPolling() {
     if (e.message !== 'unauthorized') $('list').innerHTML = '<div class="empty">Не удалось загрузить заявки. Проверьте интернет и обновите страницу.</div>';
   });
   if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(() => { if (!document.hidden && authToken) loadBookings().catch(console.error); }, 20000);
+  pollTimer = setInterval(() => { if (!document.hidden && authToken) loadBookings().catch(console.error); }, 60000);
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && authToken) loadBookings().catch(console.error); });
 
