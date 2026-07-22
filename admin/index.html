@@ -88,6 +88,11 @@
 .alga-admin .search:focus-within{border-color:var(--c-accent); box-shadow:0 0 0 3px rgba(14,95,118,.1);}
 .alga-admin .search input{flex:1; min-width:0; border:none; outline:none; background:transparent; font-family:inherit; font-size:14px; color:var(--c-ink);}
 .alga-admin .search input::placeholder{color:#aab8bd;}
+.alga-admin .search-clear{flex-shrink:0; width:22px; height:22px; border:none; border-radius:50%;
+  background:#eef2f2; color:#6a7c83; cursor:pointer; display:none; align-items:center; justify-content:center;
+  font-size:15px; line-height:1; padding:0; transition:background .15s, color .15s;}
+.alga-admin .search-clear:hover{background:#e0e7e7; color:var(--c-accent);}
+.alga-admin .search-clear.show{display:flex;}
 .alga-admin .filter-row{display:flex; gap:8px; margin-bottom:18px;}
 .alga-admin .filter-row select{flex:1; min-width:0; height:42px; padding:0 2rem 0 12px;
   border:1.5px solid var(--c-line); border-radius:11px; background:#fff; color:var(--c-ink);
@@ -220,6 +225,7 @@
     <div class="search">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#aab8bd" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="#aab8bd" stroke-width="1.8" stroke-linecap="round"/></svg>
       <input type="text" id="searchInput" placeholder="Поиск по имени или телефону">
+      <button type="button" class="search-clear" id="searchClear" aria-label="Очистить поиск">&times;</button>
     </div>
     <div class="filter-row">
       <select id="typeFilter">
@@ -384,13 +390,21 @@ function startPolling() {
     if (e.message !== 'unauthorized') $('list').innerHTML = '<div class="empty">Не удалось загрузить заявки. Проверьте интернет и обновите страницу.</div>';
   });
   if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(() => { if (!document.hidden && authToken) loadBookings().catch(console.error); }, 60000);
+  pollTimer = setInterval(() => { if (!document.hidden && authToken) loadBookings().catch(console.error); }, 30000);
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && authToken) loadBookings().catch(console.error); });
 
 if (authToken) showPanel(); else showLogin();
 
 ['searchInput','typeFilter','statusFilter'].forEach((id) => $(id).addEventListener('input', render));
+
+(function () {
+  const inp = $('searchInput'), clr = $('searchClear');
+  const sync = () => clr.classList.toggle('show', inp.value.length > 0);
+  inp.addEventListener('input', sync);
+  clr.addEventListener('click', () => { inp.value = ''; sync(); render(); inp.focus(); });
+  sync();
+})();
 
 function render() {
   const count = (f) => allBookings.filter(f).length;
