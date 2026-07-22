@@ -111,7 +111,8 @@ function tgSend(text) {
     const req = https.request({
       hostname: 'api.telegram.org', path: `/bot${BOT_TOKEN}/sendMessage`, method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
-    }, (res) => { res.on('data', () => {}); res.on('end', resolve); });
+    }, (res) => { let d = ''; res.on('data', (c) => { d += c; }); res.on('end', () => { if (res.statusCode !== 200) console.error('tg http', res.statusCode, d.slice(0, 200)); resolve(); }); });
+    req.setTimeout(8000, () => { console.error('tg timeout'); req.destroy(); });
     req.on('error', (e) => { console.error('tg error', e.message); resolve(); });
     req.write(payload); req.end();
   })));
@@ -199,8 +200,9 @@ module.exports.handler = async (event) => {
     return html(500, 'DB error');
   }
 
-  // уведомления шлём параллельно, ошибки не роняют ответ клиенту
-  await Promise.allSettled([tgSend(tgMessage(b)), pushAll(b)]);
+  // уведомления шлём параллельно, ошибки/зависания не роняют ответ клиенту
+  const cap = new Promise((r) => setTimeout(r, 9000));
+  await Promise.race([Promise.allSettled([tgSend(tgMessage(b)), pushAll(b)]), cap]);
 
   return html(200, OK_HTML);
 };
