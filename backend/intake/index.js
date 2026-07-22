@@ -200,9 +200,10 @@ module.exports.handler = async (event) => {
     return html(500, 'DB error');
   }
 
-  // уведомления шлём параллельно, ошибки/зависания не роняют ответ клиенту
-  const cap = new Promise((r) => setTimeout(r, 9000));
-  await Promise.race([Promise.allSettled([tgSend(tgMessage(b)), pushAll(b)]), cap]);
+  // уведомления шлём параллельно и ДОЖИДАЕМСЯ завершения — иначе после
+  // возврата ответа serverless-функция замораживается и Telegram может не дойти.
+  // У tgSend свой таймаут 8с, у web-push — свой, зависнуть надолго не могут.
+  await Promise.allSettled([tgSend(tgMessage(b)), pushAll(b)]);
 
   return html(200, OK_HTML);
 };
