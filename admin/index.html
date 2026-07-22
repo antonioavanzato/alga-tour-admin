@@ -512,8 +512,8 @@ function openModal(id) {
     <div class="m-rows">${rows.join('')}</div>
     ${b.notes ? `<div class="m-notes">📝 ${esc(b.notes)}</div>` : ''}
     <div class="m-actions">
-      <a class="m-btn b-wa" href="https://wa.me/${digits}" target="_blank" rel="noopener">${waIcon} WhatsApp</a>
-      <a class="m-btn b-tg" href="https://t.me/+${digits}" target="_blank" rel="noopener">${tgIcon} Telegram</a>
+      <a class="m-btn b-wa" href="whatsapp://send?phone=${digits}">${waIcon} WhatsApp</a>
+      <a class="m-btn b-tg" href="tg://resolve?phone=${digits}">${tgIcon} Telegram</a>
       <a class="m-btn b-call" href="tel:+${digits}">${callIcon} Позвонить</a>
       <button class="m-btn b-copy" id="copyPhone">${copyIcon} Копировать</button>
       <button class="m-btn b-del" id="delBtn">${delIcon} Удалить заявку</button>
