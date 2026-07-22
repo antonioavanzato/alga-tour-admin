@@ -1,0 +1,11 @@
+{
+  "name": "alga-admin-api",
+  "version": "1.0.0",
+  "description": "ALGA — API админ-панели (Yandex Database)",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.556.0",
+    "@aws-sdk/lib-dynamodb": "^3.556.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
