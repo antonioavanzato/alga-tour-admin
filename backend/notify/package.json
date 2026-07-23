@@ -1,0 +1,11 @@
+{
+  "name": "alga-notify",
+  "version": "1.0.0",
+  "description": "ALGA — рассыльщик уведомлений (Telegram + Web Push) по таймеру, с повторами",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.556.0",
+    "@aws-sdk/lib-dynamodb": "^3.556.0",
+    "web-push": "^3.6.7"
+  }
+}

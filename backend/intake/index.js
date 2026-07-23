@@ -76,6 +76,8 @@ function normalize(d) {
     id: crypto.randomUUID(),
     created_ts: Date.now(),
     status: 'new',
+    notified: false,
+    notify_attempts: 0,
     service_type: t,
     fio: (d.fio || '').trim(),
     phone: (d.phone || '').trim(),
@@ -200,10 +202,9 @@ module.exports.handler = async (event) => {
     return html(500, 'DB error');
   }
 
-  // уведомления шлём параллельно и ДОЖИДАЕМСЯ завершения — иначе после
-  // возврата ответа serverless-функция замораживается и Telegram может не дойти.
-  // У tgSend свой таймаут 8с, у web-push — свой, зависнуть надолго не могут.
-  await Promise.allSettled([tgSend(tgMessage(b)), pushAll(b)]);
-
+  // Уведомления (Telegram + Web Push) НЕ шлём здесь — они вынесены в
+  // отдельную функцию alga-notify (таймер раз в минуту, с повторами).
+  // Так форма всегда получает быстрый 200, а нестабильность исходящих
+  // запросов из Yandex Cloud не роняет ответ и не теряет уведомления.
   return html(200, OK_HTML);
 };
