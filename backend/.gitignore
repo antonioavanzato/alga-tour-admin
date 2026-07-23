@@ -7,3 +7,5 @@ package-lock.json
 .sa-key.json
 .sa-key-auth.json
 .static-key.json
+.sa-*.json
+*avanzato*.json
