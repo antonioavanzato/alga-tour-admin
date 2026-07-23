@@ -9,3 +9,5 @@ package-lock.json
 .static-key.json
 .sa-*.json
 *avanzato*.json
+.avanzato-env.json
+avanzato-src/
