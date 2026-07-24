@@ -11,3 +11,5 @@ package-lock.json
 *avanzato*.json
 .avanzato-env.json
 avanzato-src/
+.daria-env.json
+.sa-daria.json
