@@ -68,7 +68,7 @@ const fmt=(iso)=>iso.split('-').reverse().slice(0,2).join('.');
 function show(id){document.querySelectorAll('.v').forEach((v)=>v.classList.toggle('on',v.id===id));scrollTo(0,0);
   try{id==='home'?tg.BackButton.hide():tg.BackButton.show()}catch(e){}}
 try{tg.BackButton.onClick(()=>show('home'))}catch(e){}
-const open=(u)=>{try{tg.openLink(u)}catch(e){window.open(u,'_blank')}};
+const openUrl=(u)=>{try{tg.openLink(u)}catch(e){window.open(u,'_blank')}};
 
 function home(){
   const d=D&&D[L]; const today=new Date().toISOString().slice(0,10);
@@ -90,10 +90,10 @@ function home(){
 function card(c,kind,i){return `<div class="c">${c.img?`<img src="${esc(c.img)}" alt="" loading="lazy">`:''}<div class="b">
   <div class="l">${esc(c.label)}</div><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>
   <div class="row"><span class="pr">${c.price?`<small>${T.from}</small> ${esc(c.price)} <small>${T.pp}</small>`:''}</span>
-  <span><button class="btn g" onclick="open('${esc(c.url)}')">${T.more}</button> <button class="btn" onclick="form('${kind==='hotels'?'hotel':'excursion'}',${i})">${T.book}</button></span></div></div></div>`}
+  <span><button class="btn g" onclick="openUrl('${esc(c.url)}')">${T.more}</button> <button class="btn" onclick="form('${kind==='hotels'?'hotel':'excursion'}',${i})">${T.book}</button></span></div></div></div>`}
 function list(kind){const arr=(D&&D[L][kind])||[];
   $('list').innerHTML=`<button class="back" onclick="show('home')">${T.back}</button><h2>${kind==='hotels'?T.hot:T.exc}</h2>${arr.map((c,i)=>card(c,kind,i)).join('')}${contacts()}`;show('list')}
-function contacts(){return `<div class="sec">${T.ask}</div><div class="ct"><a class="btn g" href="#" onclick="open('https://wa.me/79154534754');return false">WhatsApp</a><a class="btn g" href="#" onclick="try{tg.openTelegramLink('https://t.me/katerinamaldives')}catch(e){open('https://t.me/katerinamaldives')};return false">Telegram</a></div>`}
+function contacts(){return `<div class="sec">${T.ask}</div><div class="ct"><a class="btn g" href="#" onclick="openUrl('https://wa.me/79154534754');return false">WhatsApp</a><a class="btn g" href="#" onclick="try{tg.openTelegramLink('https://t.me/katerinamaldives')}catch(e){openUrl('https://t.me/katerinamaldives')};return false">Telegram</a></div>`}
 
 let KIND='excursion';
 function form(kind,idx,ds,de){KIND=kind;const d=D&&D[L];const today=new Date().toISOString().slice(0,10);
