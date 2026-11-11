@@ -459,7 +459,8 @@ $('logoutBtn').addEventListener('click', () => {
 
 function showPanel() {
   loginScreen.classList.add('hidden'); panel.classList.remove('hidden');
-  $('userEmail').textContent = authEmail || '';
+  $('userEmail').textContent = !authEmail ? '' : (/^antonioavanzato@/i.test(authEmail) ? 'Антон' : 'Катя');
+  $('userEmail').title = authEmail || '';
   if ('Notification' in window && Notification.permission === 'granted') { $('bellBtn').classList.add('on'); enablePush(); }
   knownIds = null; startPolling();
 }
