@@ -72,7 +72,7 @@ const openUrl=(u)=>{try{tg.openLink(u)}catch(e){window.open(u,'_blank')}};
 
 function home(){
   const d=D&&D[L]; const today=new Date().toISOString().slice(0,10);
-  const dates=d?d.tours.dates.filter((x)=>x.start>=today).slice(0,4):[];
+  const dates=d?d.tours.dates.filter((x)=>x.start>=today):[];
   const top=d?d.excursions.slice(0,3):[];
   $('home').innerHTML=`<div class="hero"><h1>${T.hi}</h1><p>${T.sub}</p></div>
   <div class="tiles">
