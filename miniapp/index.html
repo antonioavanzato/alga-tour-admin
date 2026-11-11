@@ -32,7 +32,7 @@ h1,h2{font-family:Jost,sans-serif;margin:4px 0 12px}h1{font-size:28px}h2{font-si
 label{display:block;margin:12px 0 4px;font-size:13px;color:var(--mu);font-weight:600}
 input,select,textarea{width:100%;padding:12px;border:1px solid var(--ln);border-radius:12px;background:var(--card);color:var(--tx);font:15px Manrope}
 textarea{min-height:70px}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.chk{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px}.chk input{width:auto}
+.chk{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px}.chk input{width:auto}.chk a{color:var(--aq)}.btn:disabled{opacity:.45}
 .err{color:#d23c3c;font-size:13px;min-height:18px;margin-top:8px}
 .ct{display:flex;gap:8px;margin-top:16px}.ct a{flex:1;text-align:center;text-decoration:none}
 .foot{color:var(--mu);font-size:12px;text-align:center;margin-top:18px}
@@ -51,8 +51,8 @@ const tg=window.Telegram&&Telegram.WebApp; try{tg.ready();tg.expand()}catch(e){}
 const code=((tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.language_code)||navigator.language||'ru').toLowerCase();
 const L=/^(ru|uk|be|kk)/.test(code)?'ru':'en';
 document.documentElement.lang=L;
-const T={ru:{hi:'ALGA · Мальдивы',sub:'Экскурсии, отели и туры на Маафуши',exc:'Экскурсии',excS:'Акулы, скаты, китовая акула',hot:'Отели',hotS:'Маафуши и Тодду',tour:'Авторский тур',tourS:'7 островов + фотосъёмка',res:'Резорт на день',resS:'Пляж и отдых в резорте',div:'Дайвинг',divS:'Погружения с инструктором',near:'Ближайшие даты тура',from:'от',pp:'с человека',book:'Забронировать',more:'Подробнее',back:'← Назад',fio:'Имя и фамилия',phone:'Телефон / WhatsApp',date:'Дата',people:'Сколько человек',ci:'Заезд',co:'Выезд',rooms:'Номеров',guests:'Гостей',start:'Начало',end:'Конец',isl:'Откуда забрать',other:'Другой остров',priv:'Нужен индивидуальный трансфер',notes:'Пожелания',agree:'Согласен на обработку персональных данных',send:'Отправить заявку',sending:'Отправляем…',ok:'Заявка отправлена!',okS:'Мы свяжемся с вами в ближайшее время.',close:'Закрыть',fill:'Заполните имя, дату и телефон в формате +7 (999) 123-45-67',fail:'Не удалось отправить. Напишите нам в WhatsApp или Telegram.',ask:'Есть вопрос? Напишите нам',choose:'Что бронируем',upd:'Данные с сайта от'},
-en:{hi:'ALGA · Maldives',sub:'Excursions, hotels and tours on Maafushi',exc:'Excursions',excS:'Sharks, rays, whale shark',hot:'Hotels',hotS:'Maafushi & Thoddoo',tour:'Signature tour',tourS:'7 islands + photo shoot',res:'Resort day trip',resS:'Beach day at a resort',div:'Diving',divS:'Dives with an instructor',near:'Upcoming tour dates',from:'from',pp:'per person',book:'Book',more:'Details',back:'← Back',fio:'Full name',phone:'Phone / WhatsApp',date:'Date',people:'Number of people',ci:'Check-in',co:'Check-out',rooms:'Rooms',guests:'Guests',start:'Start',end:'End',isl:'Pick-up island',other:'Other island',priv:'I need a private transfer',notes:'Notes',agree:'I agree to the processing of personal data',send:'Send request',sending:'Sending…',ok:'Request sent!',okS:'We will contact you shortly.',close:'Close',fill:'Please fill in name, date and phone in international format, e.g. +44 7700 900123',fail:'Could not send. Please message us on WhatsApp or Telegram.',ask:'Questions? Message us',choose:'What to book',upd:'Site data from'}}[L];
+const T={ru:{hi:'ALGA · Мальдивы',sub:'Экскурсии, отели и туры на Маафуши',exc:'Экскурсии',excS:'Акулы, скаты, китовая акула',hot:'Отели',hotS:'Маафуши и Тодду',tour:'Авторский тур',tourS:'7 островов + фотосъёмка',res:'Резорт на день',resS:'Пляж и отдых в резорте',div:'Дайвинг',divS:'Погружения с инструктором',near:'Ближайшие даты тура',from:'от',pp:'с человека',book:'Забронировать',more:'Подробнее',back:'← Назад',fio:'Имя и фамилия',phone:'Телефон / WhatsApp',date:'Дата',people:'Сколько человек',ci:'Заезд',co:'Выезд',rooms:'Номеров',guests:'Гостей',start:'Начало',end:'Конец',isl:'Откуда забрать',other:'Другой остров',priv:'Нужен индивидуальный трансфер',notes:'Пожелания',agree:'Я согласен с <a href="#" onclick="event.preventDefault();event.stopPropagation();openUrl(\'https://alga-tour.com/legal-privacy\')">политикой конфиденциальности</a> и обработкой персональных данных',agreeErr:'Подтвердите согласие с политикой конфиденциальности',send:'Отправить заявку',sending:'Отправляем…',ok:'Заявка отправлена!',okS:'Мы свяжемся с вами в ближайшее время.',close:'Закрыть',fill:'Заполните имя, дату и телефон в формате +7 (999) 123-45-67',fail:'Не удалось отправить. Напишите нам в WhatsApp или Telegram.',ask:'Есть вопрос? Напишите нам',choose:'Что бронируем',upd:'Данные с сайта от'},
+en:{hi:'ALGA · Maldives',sub:'Excursions, hotels and tours on Maafushi',exc:'Excursions',excS:'Sharks, rays, whale shark',hot:'Hotels',hotS:'Maafushi & Thoddoo',tour:'Signature tour',tourS:'7 islands + photo shoot',res:'Resort day trip',resS:'Beach day at a resort',div:'Diving',divS:'Dives with an instructor',near:'Upcoming tour dates',from:'from',pp:'per person',book:'Book',more:'Details',back:'← Back',fio:'Full name',phone:'Phone / WhatsApp',date:'Date',people:'Number of people',ci:'Check-in',co:'Check-out',rooms:'Rooms',guests:'Guests',start:'Start',end:'End',isl:'Pick-up island',other:'Other island',priv:'I need a private transfer',notes:'Notes',agree:'I agree to the <a href="#" onclick="event.preventDefault();event.stopPropagation();openUrl(\'https://alga-tour.com/en/legal-privacy\')">privacy policy</a> and processing of personal data',agreeErr:'Please accept the privacy policy',send:'Send request',sending:'Sending…',ok:'Request sent!',okS:'We will contact you shortly.',close:'Close',fill:'Please fill in name, date and phone in international format, e.g. +44 7700 900123',fail:'Could not send. Please message us on WhatsApp or Telegram.',ask:'Questions? Message us',choose:'What to book',upd:'Site data from'}}[L];
 
 /* Значения как в форме на сайте */
 const EXC_OPT=[['akuly','АКУЛЫ ПЕСЧАНАЯ КОСА ДЕЛЬФИНЫ СКАТЫ'],['kitov','СНОРКЛИНГ С КИТОВОЙ АКУЛОЙ'],['kaafu','HALF DAY'],['male','МАЛЕ — СТОЛИЦА МАЛЬДИВ']];
@@ -119,8 +119,8 @@ function form(kind,idx,ds,de){KIND=kind;const d=D&&D[L];const today=new Date().t
   <input name="isl_other" style="display:none;margin-top:8px" placeholder="${T.other}">
   <label class="chk"><input type="checkbox" name="private_transfer" value="Да"> ${T.priv}</label>
   <label>${T.notes}</label><textarea name="important_notes"></textarea>
-  <label class="chk"><input type="checkbox" id="agree"> ${T.agree}</label>
-  <div class="err" id="err"></div><button class="btn f" id="sb">${T.send}</button></form>`;
+  <label class="chk"><input type="checkbox" id="agree" onchange="$('sb').disabled=!this.checked"> <span>${T.agree}</span></label>
+  <div class="err" id="err"></div><button class="btn f" id="sb" disabled>${T.send}</button></form>`;
   show('form')}
 function pickTour(el,s,e){document.querySelectorAll('#tdates .chip').forEach((c)=>c.classList.toggle('on',c===el));const f=$('f');f.author_date_start.value=s;f.author_date_end.value=e}
 
@@ -134,7 +134,7 @@ const DATEF={excursion:'excursion_date',hotel:'check_in_date',resort:'resort_dat
 async function send(ev){ev.preventDefault();const f=$('f'),err=$('err'),b=$('sb');err.textContent='';
   const fd=new FormData(f);
   if(!String(fd.get('fio')).trim()||!phoneOk(String(fd.get('phone')))||!fd.get(DATEF[KIND])){err.textContent=T.fill;return false}
-  if(!$('agree').checked){err.textContent=T.agree;return false}
+  if(!$('agree').checked){err.textContent=T.agreeErr;return false}
   if(fd.get('departure_island')==='other')fd.set('departure_island',String(fd.get('isl_other')).trim()||'other');
   fd.delete('isl_other');fd.set('phone',phoneFmt(String(fd.get('phone'))));fd.set('service_type',KIND);fd.set('key',KEY);
   const u=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user;
@@ -143,7 +143,7 @@ async function send(ev){ev.preventDefault();const f=$('f'),err=$('err'),b=$('sb'
   try{const r=await fetch(ENDPOINT,{method:'POST',body:new URLSearchParams(fd)});if(!r.ok)throw 0;
     $('done').innerHTML=`<div class="hero"><h1>✅ ${T.ok}</h1><p>${T.okS}</p></div><button class="btn f" onclick="try{tg.close()}catch(e){show('home')}">${T.close}</button>${contacts()}`;show('done');
     try{tg.HapticFeedback.notificationOccurred('success')}catch(e){}}
-  catch(e){err.textContent=T.fail}finally{b.disabled=false;b.textContent=T.send}return false}
+  catch(e){err.textContent=T.fail}finally{b.disabled=!$('agree').checked;b.textContent=T.send}return false}
 
 home();
 fetch('data.json?'+Date.now().toString().slice(0,-5)).then((r)=>r.json()).then((j)=>{D=j;home()}).catch(()=>{});
