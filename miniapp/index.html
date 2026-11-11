@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ALGA Maldives</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ac:#0e5f76;--aq:#2bbdee;--bg:#f4f8fa;--card:#fff;--tx:#0f2730;--mu:#5d7480;--ln:#dbe6ea}
+@media (prefers-color-scheme:dark){:root{--bg:#071a21;--card:#0d2730;--tx:#e9f4f7;--mu:#8fb0bb;--ln:#1d3d48}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 Manrope,system-ui,sans-serif}
+.v{display:none;padding:16px 16px 100px;max-width:560px;margin:0 auto}.v.on{display:block}
+h1,h2{font-family:Jost,sans-serif;margin:4px 0 12px}h1{font-size:28px}h2{font-size:22px}
+.hero{border-radius:20px;padding:22px 18px;color:#fff;background:linear-gradient(135deg,var(--ac),var(--aq));margin-bottom:16px}
+.hero p{margin:4px 0 0;opacity:.9}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:14px;cursor:pointer;min-height:96px}
+.tile b{display:block;font-family:Jost;font-size:17px}.tile small{color:var(--mu)}.tile i{font-style:normal;font-size:24px}
+.tile.w{grid-column:span 2}
+.sec{margin:20px 0 8px;font-family:Jost;font-size:18px}
+.c{background:var(--card);border:1px solid var(--ln);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.c img{width:100%;height:170px;object-fit:cover;display:block;background:var(--ln)}
+.c .b{padding:12px 14px}.c .l{color:var(--aq);font-size:12px;font-weight:700;text-transform:uppercase}
+.c h3{margin:4px 0;font-family:Jost;font-size:18px}.c p{margin:0 0 10px;color:var(--mu);font-size:14px}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.pr{font-weight:700;font-size:18px}.pr small{font-weight:400;color:var(--mu);font-size:12px}
+.btn{border:0;border-radius:12px;padding:11px 16px;font:600 15px Manrope;background:var(--ac);color:#fff;cursor:pointer}
+.btn.g{background:transparent;color:var(--ac);border:1px solid var(--ln)}.btn.f{width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1px solid var(--ln);background:var(--card);border-radius:20px;padding:8px 12px;cursor:pointer;font-size:14px}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.back{background:none;border:0;color:var(--ac);font:600 15px Manrope;padding:0;margin-bottom:8px;cursor:pointer}
+label{display:block;margin:12px 0 4px;font-size:13px;color:var(--mu);font-weight:600}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--ln);border-radius:12px;background:var(--card);color:var(--tx);font:15px Manrope}
+textarea{min-height:70px}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chk{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px}.chk input{width:auto}
+.err{color:#d23c3c;font-size:13px;min-height:18px;margin-top:8px}
+.ct{display:flex;gap:8px;margin-top:16px}.ct a{flex:1;text-align:center;text-decoration:none}
+.foot{color:var(--mu);font-size:12px;text-align:center;margin-top:18px}
+.hp{position:absolute;left:-9999px}
+</style></head><body>
+
+<section class="v on" id="home"></section>
+<section class="v" id="list"></section>
+<section class="v" id="form"></section>
+<section class="v" id="done"></section>
+
+<script>
+const ENDPOINT='https://functions.yandexcloud.net/d4es0egg4car1h5d62n0';
+const KEY='Alga9f230f63!';
+const tg=window.Telegram&&Telegram.WebApp; try{tg.ready();tg.expand()}catch(e){}
+const code=((tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.language_code)||navigator.language||'ru').toLowerCase();
+const L=/^(ru|uk|be|kk)/.test(code)?'ru':'en';
+document.documentElement.lang=L;
+const T={ru:{hi:'ALGA · Мальдивы',sub:'Экскурсии, отели и туры на Маафуши',exc:'Экскурсии',excS:'Акулы, скаты, китовая акула',hot:'Отели',hotS:'Маафуши и Тодду',tour:'Авторский тур',tourS:'7 островов + фотосъёмка',res:'Резорт на день',resS:'Пляж и отдых в резорте',div:'Дайвинг',divS:'Погружения с инструктором',near:'Ближайшие даты тура',from:'от',pp:'с человека',book:'Забронировать',more:'Подробнее',back:'← Назад',fio:'Имя и фамилия',phone:'Телефон / WhatsApp',date:'Дата',people:'Сколько человек',ci:'Заезд',co:'Выезд',rooms:'Номеров',guests:'Гостей',start:'Начало',end:'Конец',isl:'Откуда забрать',other:'Другой остров',priv:'Нужен индивидуальный трансфер',notes:'Пожелания',agree:'Согласен на обработку персональных данных',send:'Отправить заявку',sending:'Отправляем…',ok:'Заявка отправлена!',okS:'Мы свяжемся с вами в ближайшее время.',close:'Закрыть',fill:'Заполните имя, телефон и дату',fail:'Не удалось отправить. Напишите нам в WhatsApp или Telegram.',ask:'Есть вопрос? Напишите нам',choose:'Что бронируем',upd:'Данные с сайта от'},
+en:{hi:'ALGA · Maldives',sub:'Excursions, hotels and tours on Maafushi',exc:'Excursions',excS:'Sharks, rays, whale shark',hot:'Hotels',hotS:'Maafushi & Thoddoo',tour:'Signature tour',tourS:'7 islands + photo shoot',res:'Resort day trip',resS:'Beach day at a resort',div:'Diving',divS:'Dives with an instructor',near:'Upcoming tour dates',from:'from',pp:'per person',book:'Book',more:'Details',back:'← Back',fio:'Full name',phone:'Phone / WhatsApp',date:'Date',people:'Number of people',ci:'Check-in',co:'Check-out',rooms:'Rooms',guests:'Guests',start:'Start',end:'End',isl:'Pick-up island',other:'Other island',priv:'I need a private transfer',notes:'Notes',agree:'I agree to the processing of personal data',send:'Send request',sending:'Sending…',ok:'Request sent!',okS:'We will contact you shortly.',close:'Close',fill:'Please fill in name, phone and date',fail:'Could not send. Please message us on WhatsApp or Telegram.',ask:'Questions? Message us',choose:'What to book',upd:'Site data from'}}[L];
+
+/* Значения как в форме на сайте */
+const EXC_OPT=[['akuly','АКУЛЫ ПЕСЧАНАЯ КОСА ДЕЛЬФИНЫ СКАТЫ'],['kitov','СНОРКЛИНГ С КИТОВОЙ АКУЛОЙ'],['kaafu','HALF DAY'],['male','МАЛЕ — СТОЛИЦА МАЛЬДИВ']];
+const HOT_OPT=[['palm','KAANI PALM HOTEL'],['grand','KAANI GRAND'],['arena','ARENA BEACH HOTEL'],['icom','ICOM BLUE MAAFUSHI'],['thod','THE PALMS THOODOO']];
+const RESORTS=['OLHUVELHI SUN SIYAM','ADAARAN CLUB RANHALI','FIHALHOHI ISLAND','CENTARA RAS FUSHI'];
+const ISL=['Мале','Хулуле','Маафуши','Гули','Рашиду'];
+const optFor=(list,c)=>{const k=(c.url+' '+c.title).toLowerCase();const f=list.find(([s])=>k.includes(s));return f?f[1]:c.title.toUpperCase()};
+
+let D=null;
+const $=(id)=>document.getElementById(id);
+const esc=(s)=>String(s||'').replace(/[&<>"]/g,(m)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const fmt=(iso)=>iso.split('-').reverse().slice(0,2).join('.');
+function show(id){document.querySelectorAll('.v').forEach((v)=>v.classList.toggle('on',v.id===id));scrollTo(0,0);
+  try{id==='home'?tg.BackButton.hide():tg.BackButton.show()}catch(e){}}
+try{tg.BackButton.onClick(()=>show('home'))}catch(e){}
+const open=(u)=>{try{tg.openLink(u)}catch(e){window.open(u,'_blank')}};
+
+function home(){
+  const d=D&&D[L]; const today=new Date().toISOString().slice(0,10);
+  const dates=d?d.tours.dates.filter((x)=>x.start>=today).slice(0,4):[];
+  const top=d?d.excursions.slice(0,3):[];
+  $('home').innerHTML=`<div class="hero"><h1>${T.hi}</h1><p>${T.sub}</p></div>
+  <div class="tiles">
+   <div class="tile" onclick="list('excursions')"><i>🦈</i><b>${T.exc}</b><small>${T.excS}</small></div>
+   <div class="tile" onclick="list('hotels')"><i>🏝</i><b>${T.hot}</b><small>${T.hotS}</small></div>
+   <div class="tile" onclick="form('author')"><i>📸</i><b>${T.tour}</b><small>${T.tourS}</small></div>
+   <div class="tile" onclick="form('resort')"><i>🌴</i><b>${T.res}</b><small>${T.resS}</small></div>
+   <div class="tile w" onclick="form('diving')"><i>🤿</i><b>${T.div}</b><small>${T.divS}</small></div>
+  </div>
+  ${dates.length?`<div class="sec">${T.near}</div><div class="chips">${dates.map((x)=>`<span class="chip" onclick="form('author',null,'${x.start}','${x.end}')">${fmt(x.start)} — ${fmt(x.end)}</span>`).join('')}</div>`:''}
+  ${top.length?`<div class="sec">${T.exc}</div>${top.map((c,i)=>card(c,'excursions',i)).join('')}`:''}
+  ${contacts()}
+  ${D?`<div class="foot">${T.upd} ${new Date(D.updated).toLocaleDateString(L)}</div>`:''}`;
+}
+function card(c,kind,i){return `<div class="c">${c.img?`<img src="${esc(c.img)}" alt="" loading="lazy">`:''}<div class="b">
+  <div class="l">${esc(c.label)}</div><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>
+  <div class="row"><span class="pr">${c.price?`<small>${T.from}</small> ${esc(c.price)} <small>${T.pp}</small>`:''}</span>
+  <span><button class="btn g" onclick="open('${esc(c.url)}')">${T.more}</button> <button class="btn" onclick="form('${kind==='hotels'?'hotel':'excursion'}',${i})">${T.book}</button></span></div></div></div>`}
+function list(kind){const arr=(D&&D[L][kind])||[];
+  $('list').innerHTML=`<button class="back" onclick="show('home')">${T.back}</button><h2>${kind==='hotels'?T.hot:T.exc}</h2>${arr.map((c,i)=>card(c,kind,i)).join('')}${contacts()}`;show('list')}
+function contacts(){return `<div class="sec">${T.ask}</div><div class="ct"><a class="btn g" href="#" onclick="open('https://wa.me/79154534754');return false">WhatsApp</a><a class="btn g" href="#" onclick="try{tg.openTelegramLink('https://t.me/katerinamaldives')}catch(e){open('https://t.me/katerinamaldives')};return false">Telegram</a></div>`}
+
+let KIND='excursion';
+function form(kind,idx,ds,de){KIND=kind;const d=D&&D[L];const today=new Date().toISOString().slice(0,10);
+  const sel=(name,opts,pick)=>`<select name="${name}">${opts.map(([v,t])=>`<option value="${esc(v)}"${v===pick?' selected':''}>${esc(t)}</option>`).join('')}</select>`;
+  const n=(name)=>`<input name="${name}" type="number" min="1" value="2" inputmode="numeric">`;
+  const dt=(name,v)=>`<input name="${name}" type="date" min="${today}" value="${v||''}">`;
+  let f='',title='';
+  if(kind==='excursion'){title=T.exc;const cs=(d&&d.excursions)||[];const opts=cs.map((c)=>[optFor(EXC_OPT,c),c.title]);if(!opts.length)EXC_OPT.forEach(([,v])=>opts.push([v,v]));
+    f=`<label>${T.choose}</label>${sel('excursion',opts,opts[idx||0]&&opts[idx||0][0])}<label>${T.date}</label>${dt('excursion_date')}<label>${T.people}</label>${n('people_count')}`}
+  if(kind==='hotel'){title=T.hot;const cs=(d&&d.hotels)||[];const opts=cs.map((c)=>[optFor(HOT_OPT,c),c.title]);if(!opts.length)HOT_OPT.forEach(([,v])=>opts.push([v,v]));
+    f=`<label>${T.choose}</label>${sel('hotel_booking',opts,opts[idx||0]&&opts[idx||0][0])}<div class="two"><div><label>${T.ci}</label>${dt('check_in_date')}</div><div><label>${T.co}</label>${dt('check_out_date')}</div></div><div class="two"><div><label>${T.rooms}</label><input name="room_count" type="number" min="1" value="1"></div><div><label>${T.guests}</label>${n('hotel_guests')}</div></div>`}
+  if(kind==='resort'){title=T.res;f=`<label>${T.choose}</label>${sel('resort_excursion',RESORTS.map((r)=>[r,r]))}<label>${T.date}</label>${dt('resort_date')}<label>${T.people}</label>${n('resort_people_count')}`}
+  if(kind==='author'){title=T.tour;const ds2=(d?d.tours.dates.filter((x)=>x.start>=today):[]);
+    f=`<input type="hidden" name="author_tour" value="Авторский тур Маафуши">${ds2.length?`<label>${T.near}</label><div class="chips" id="tdates">${ds2.map((x)=>`<span class="chip${x.start===ds?' on':''}" onclick="pickTour(this,'${x.start}','${x.end}')">${fmt(x.start)} — ${fmt(x.end)}</span>`).join('')}</div>`:''}
+    <div class="two"><div><label>${T.start}</label>${dt('author_date_start',ds)}</div><div><label>${T.end}</label>${dt('author_date_end',de)}</div></div><label>${T.people}</label>${n('author_people_count')}`}
+  if(kind==='diving'){title=T.div;f=`<label>${T.date}</label>${dt('diving_date')}<label>${T.people}</label>${n('diving_people_count')}`}
+  const u=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user;const name=u?[u.first_name,u.last_name].filter(Boolean).join(' '):'';
+  $('form').innerHTML=`<button class="back" onclick="show('home')">${T.back}</button><h2>${title}</h2>
+  <form id="f" onsubmit="return send(event)"><input class="hp" name="company" tabindex="-1" autocomplete="off">${f}
+  <label>${T.fio}</label><input name="fio" value="${esc(name)}" autocomplete="name">
+  <label>${T.phone}</label><input name="phone" type="tel" inputmode="tel" placeholder="+7 (999) 123-45-67" autocomplete="tel">
+  <label>${T.isl}</label><select name="departure_island" onchange="this.form.isl_other.style.display=this.value==='other'?'block':'none'">${ISL.map((i)=>`<option>${i}</option>`).join('')}<option value="other">${T.other}</option></select>
+  <input name="isl_other" style="display:none;margin-top:8px" placeholder="${T.other}">
+  <label class="chk"><input type="checkbox" name="private_transfer" value="Да"> ${T.priv}</label>
+  <label>${T.notes}</label><textarea name="important_notes"></textarea>
+  <label class="chk"><input type="checkbox" id="agree"> ${T.agree}</label>
+  <div class="err" id="err"></div><button class="btn f" id="sb">${T.send}</button></form>`;
+  show('form')}
+function pickTour(el,s,e){document.querySelectorAll('#tdates .chip').forEach((c)=>c.classList.toggle('on',c===el));const f=$('f');f.author_date_start.value=s;f.author_date_end.value=e}
+
+function phoneFmt(v){const d=v.replace(/\D/g,'');const r=d.length===11&&/^[78]/.test(d)?d.slice(1):d.length===10&&d[0]==='9'?d:null;
+  return r?`+7 (${r.slice(0,3)}) ${r.slice(3,6)}-${r.slice(6,8)}-${r.slice(8)}`:v.trim()}
+const DATEF={excursion:'excursion_date',hotel:'check_in_date',resort:'resort_date',author:'author_date_start',diving:'diving_date'};
+async function send(ev){ev.preventDefault();const f=$('f'),err=$('err'),b=$('sb');err.textContent='';
+  const fd=new FormData(f);
+  if(!String(fd.get('fio')).trim()||String(fd.get('phone')).replace(/\D/g,'').length<7||!fd.get(DATEF[KIND])){err.textContent=T.fill;return false}
+  if(!$('agree').checked){err.textContent=T.agree;return false}
+  if(fd.get('departure_island')==='other')fd.set('departure_island',String(fd.get('isl_other')).trim()||'other');
+  fd.delete('isl_other');fd.set('phone',phoneFmt(String(fd.get('phone'))));fd.set('service_type',KIND);fd.set('key',KEY);
+  const u=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user;
+  if(u&&u.username)fd.set('important_notes',(String(fd.get('important_notes')||'')+`\nTelegram: @${u.username}`).trim());
+  b.disabled=true;b.textContent=T.sending;
+  try{const r=await fetch(ENDPOINT,{method:'POST',body:new URLSearchParams(fd)});if(!r.ok)throw 0;
+    $('done').innerHTML=`<div class="hero"><h1>✅ ${T.ok}</h1><p>${T.okS}</p></div><button class="btn f" onclick="try{tg.close()}catch(e){show('home')}">${T.close}</button>${contacts()}`;show('done');
+    try{tg.HapticFeedback.notificationOccurred('success')}catch(e){}}
+  catch(e){err.textContent=T.fail}finally{b.disabled=false;b.textContent=T.send}return false}
+
+home();
+fetch('data.json?'+Date.now().toString().slice(0,-5)).then((r)=>r.json()).then((j)=>{D=j;home()}).catch(()=>{});
+</script></body></html>

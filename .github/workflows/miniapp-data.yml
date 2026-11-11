@@ -1,0 +1,17 @@
+name: Мини-приложение — обновить данные с сайта
+on:
+  schedule: [{ cron: '0 3 * * *' }]
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: node miniapp/scrape.js
+      - run: |
+          git config user.name "alga-bot"; git config user.email "actions@users.noreply.github.com"
+          git add miniapp/data.json
+          git diff --cached --quiet || (git commit -m "data: обновление с alga-tour.com" && git push)
