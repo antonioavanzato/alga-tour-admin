@@ -31,7 +31,7 @@ h1,h2{font-family:Jost,sans-serif;margin:4px 0 12px}h1{font-size:28px}h2{font-si
 .back{background:none;border:0;color:var(--ac);font:600 15px Manrope;padding:0;margin-bottom:8px;cursor:pointer}
 label{display:block;margin:12px 0 4px;font-size:13px;color:var(--mu);font-weight:600}
 input,select,textarea{width:100%;padding:12px;border:1px solid var(--ln);border-radius:12px;background:var(--card);color:var(--tx);font:15px Manrope}
-textarea{min-height:70px}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+textarea{min-height:70px}.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.two>div{min-width:0}input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;height:48px;line-height:24px;text-align:left}input[type=date]::-webkit-date-and-time-value{text-align:left}
 .chk{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px}.chk input{width:auto}.chk a{color:var(--aq)}.btn:disabled{opacity:.45}
 .err{color:#d23c3c;font-size:13px;min-height:18px;margin-top:8px}
 .ct{display:flex;gap:8px;margin-top:16px}.ct a{flex:1;text-align:center;text-decoration:none}
@@ -55,11 +55,11 @@ const T={ru:{hi:'ALGA · Мальдивы',sub:'Экскурсии, отели �
 en:{hi:'ALGA · Maldives',sub:'Excursions, hotels and tours on Maafushi',exc:'Excursions',excS:'Sharks, rays, whale shark',hot:'Hotels',hotS:'Maafushi & Thoddoo',tour:'Signature tour',tourS:'7 islands + photo shoot',res:'Resort day trip',resS:'Beach day at a resort',div:'Diving',divS:'Dives with an instructor',near:'Upcoming tour dates',from:'from',pp:'per person',book:'Book',more:'Details',back:'← Back',fio:'Full name',phone:'Phone / WhatsApp',date:'Date',people:'Number of people',ci:'Check-in',co:'Check-out',rooms:'Rooms',guests:'Guests',start:'Start',end:'End',isl:'Pick-up island',other:'Other island',priv:'I need a private transfer',notes:'Notes',agree:'I agree to the <a href="#" onclick="event.preventDefault();event.stopPropagation();openUrl(\'https://alga-tour.com/en/legal-privacy\')">privacy policy</a> and processing of personal data',agreeErr:'Please accept the privacy policy',send:'Send request',sending:'Sending…',ok:'Request sent!',okS:'We will contact you shortly.',close:'Close',eDate:'Please choose a date',eName:'Please enter your name',ePhone:'Phone in international format, e.g. +44 7700 900123',fail:'Could not send. Please message us on WhatsApp or Telegram.',ask:'Questions? Message us',choose:'What to book',upd:'Site data from'}}[L];
 
 /* Значения как в форме на сайте */
-const EXC_OPT=[['akuly','АКУЛЫ ПЕСЧАНАЯ КОСА ДЕЛЬФИНЫ СКАТЫ'],['kitov','СНОРКЛИНГ С КИТОВОЙ АКУЛОЙ'],['kaafu','HALF DAY'],['male','МАЛЕ — СТОЛИЦА МАЛЬДИВ']];
-const HOT_OPT=[['palm','KAANI PALM HOTEL'],['grand','KAANI GRAND'],['arena','ARENA BEACH HOTEL'],['icom','ICOM BLUE MAAFUSHI'],['thod','THE PALMS THOODOO']];
+const EXC_OPT=[['akuly','АКУЛЫ ПЕСЧАНАЯ КОСА ДЕЛЬФИНЫ СКАТЫ'],['kitov','СНОРКЛИНГ С КИТОВОЙ АКУЛОЙ'],['kaafu','HALF DAY'],['akvarium','АКВАРИУМ И МАЛЕ'],['male','МАЛЕ — СТОЛИЦА МАЛЬДИВ']];
+const HOT_OPT=[['palms_hotel','THE PALMS THOODOO'],['thod','THE PALMS THOODOO'],['grand','KAANI GRAND'],['kaani-palm','KAANI PALM HOTEL'],['arena','ARENA BEACH HOTEL'],['icom','ICOM BLUE MAAFUSHI']];
 const RESORTS=['OLHUVELHI SUN SIYAM','ADAARAN CLUB RANHALI','FIHALHOHI ISLAND','CENTARA RAS FUSHI'];
 const ISL=['Мале','Хулуле','Маафуши','Гули','Рашиду'];
-const optFor=(list,c)=>{const k=(c.url+' '+c.title).toLowerCase();const f=list.find(([s])=>k.includes(s));return f?f[1]:c.title.toUpperCase()};
+const optFor=(list,c)=>{const k=c.url.toLowerCase().split('/').pop();const f=list.find(([s])=>k===s||k.includes(s));return f?f[1]:c.title.toUpperCase()};
 
 let D=null;
 const $=(id)=>document.getElementById(id);
@@ -78,11 +78,11 @@ function home(){
   <div class="tiles">
    <div class="tile" onclick="list('excursions')"><i>🦈</i><b>${T.exc}</b><small>${T.excS}</small></div>
    <div class="tile" onclick="list('hotels')"><i>🏝</i><b>${T.hot}</b><small>${T.hotS}</small></div>
-   <div class="tile" onclick="form('author')"><i>📸</i><b>${T.tour}</b><small>${T.tourS}</small></div>
-   <div class="tile" onclick="form('resort')"><i>🌴</i><b>${T.res}</b><small>${T.resS}</small></div>
-   <div class="tile w" onclick="form('diving')"><i>🤿</i><b>${T.div}</b><small>${T.divS}</small></div>
+   <div class="tile" onclick="openForm('author')"><i>📸</i><b>${T.tour}</b><small>${T.tourS}</small></div>
+   <div class="tile" onclick="openForm('resort')"><i>🌴</i><b>${T.res}</b><small>${T.resS}</small></div>
+   <div class="tile w" onclick="openForm('diving')"><i>🤿</i><b>${T.div}</b><small>${T.divS}</small></div>
   </div>
-  ${dates.length?`<div class="sec">${T.near}</div><div class="chips">${dates.map((x)=>`<span class="chip" onclick="form('author',null,'${x.start}','${x.end}')">${fmt(x.start)} — ${fmt(x.end)}</span>`).join('')}</div>`:''}
+  ${dates.length?`<div class="sec">${T.near}</div><div class="chips">${dates.map((x)=>`<span class="chip" onclick="openForm('author',null,'${x.start}','${x.end}')">${fmt(x.start)} — ${fmt(x.end)}</span>`).join('')}</div>`:''}
   ${top.length?`<div class="sec">${T.exc}</div>${top.map((c,i)=>card(c,'excursions',i)).join('')}`:''}
   ${contacts()}
   ${D?`<div class="foot">${T.upd} ${new Date(D.updated).toLocaleDateString(L)}</div>`:''}`;
@@ -90,13 +90,13 @@ function home(){
 function card(c,kind,i){return `<div class="c">${c.img?`<img src="${esc(c.img)}" alt="" loading="lazy">`:''}<div class="b">
   <div class="l">${esc(c.label)}</div><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>
   <div class="pr">${c.price?`<small>${T.from}</small> ${esc(c.price)} <small>${T.pp}</small>`:''}</div>
-  <div class="acts"><button class="btn g" onclick="openUrl('${esc(c.url)}')">${T.more}</button> <button class="btn" onclick="form('${kind==='hotels'?'hotel':'excursion'}',${i})">${T.book}</button></div></div></div>`}
+  <div class="acts"><button class="btn g" onclick="openUrl('${esc(c.url)}')">${T.more}</button> <button class="btn" onclick="openForm('${kind==='hotels'?'hotel':'excursion'}',${i})">${T.book}</button></div></div></div>`}
 function list(kind){const arr=(D&&D[L][kind])||[];
   $('list').innerHTML=`<button class="back" onclick="show('home')">${T.back}</button><h2>${kind==='hotels'?T.hot:T.exc}</h2>${arr.map((c,i)=>card(c,kind,i)).join('')}${contacts()}`;show('list')}
 function contacts(){return `<div class="sec">${T.ask}</div><div class="ct"><a class="btn g" href="#" onclick="openUrl('https://wa.me/79154534754');return false">WhatsApp</a><a class="btn g" href="#" onclick="try{tg.openTelegramLink('https://t.me/katerinamaldives')}catch(e){openUrl('https://t.me/katerinamaldives')};return false">Telegram</a></div>`}
 
 let KIND='excursion';
-function form(kind,idx,ds,de){KIND=kind;const d=D&&D[L];const today=new Date().toISOString().slice(0,10);
+function openForm(kind,idx,ds,de){KIND=kind;const d=D&&D[L];const today=new Date().toISOString().slice(0,10);
   const sel=(name,opts,pick)=>`<select name="${name}">${opts.map(([v,t])=>`<option value="${esc(v)}"${v===pick?' selected':''}>${esc(t)}</option>`).join('')}</select>`;
   const n=(name)=>`<input name="${name}" type="number" min="1" value="2" inputmode="numeric">`;
   const dayN=(n)=>{const x=new Date();x.setDate(x.getDate()+n);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
