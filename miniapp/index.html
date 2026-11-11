@@ -149,5 +149,10 @@ async function send(ev){ev.preventDefault();const f=$('f'),err=$('err'),b=$('sb'
   catch(e){err.textContent=T.fail}finally{b.disabled=!$('agree').checked;b.textContent=T.send}return false}
 
 home();
-fetch('data.json?'+Date.now().toString().slice(0,-5)).then((r)=>r.json()).then((j)=>{D=j;home()}).catch(()=>{});
+fetch('data.json?'+Date.now().toString().slice(0,-5)).then((r)=>r.json()).then((j)=>{D=j;home()}).catch(()=>{}).finally(()=>{
+/* Свежие данные от Google-скрипта (обновляется раз в сутки и кнопкой в админке). Картинки, которых у него нет, берём из data.json */
+fetch('https://script.google.com/macros/s/AKfycbzkJYlcK_Ha1DBa8jGYEWHyRL_6MktRm6qytWjEXiA0BDckH4ahVRSikz_nTm1JUMMQ/exec?a=data').then((r)=>r.json()).then((g)=>{if(!g||!g.ru||!g.updated)return;
+  const old=D;if(old&&new Date(old.updated)>new Date(g.updated))return;
+  if(old)for(const l of['ru','en'])for(const k of['excursions','hotels'])(g[l][k]||[]).forEach((c)=>{if(!c.img){const o=(old[l][k]||[]).find((x)=>x.url===c.url);if(o)c.img=o.img}});
+  D=g;if(document.querySelector('.v.on').id==='home')home()}).catch(()=>{});});
 </script></body></html>
