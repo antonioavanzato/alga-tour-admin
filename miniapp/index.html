@@ -37,6 +37,21 @@ textarea{min-height:70px}.two{display:grid;grid-template-columns:minmax(0,1fr) m
 .ct{display:flex;gap:8px;margin-top:16px}.ct a{flex:1;text-align:center;text-decoration:none}
 .foot{color:var(--mu);font-size:12px;text-align:center;margin-top:18px}
 .hp{position:absolute;left:-9999px}
+/* Анимации — как в мини-приложении Avanzato */
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes scr{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes lgin{0%{clip-path:inset(0 100% 0 0);opacity:.2;filter:blur(3px);transform:translateX(-6px)}60%{filter:blur(0)}100%{clip-path:inset(0 0 0 0);opacity:1;filter:none;transform:none}}
+#home.first>*{animation:up .55s cubic-bezier(.2,.8,.2,1) both}
+#home.first>:nth-child(2){animation-delay:.06s}#home.first>:nth-child(3){animation-delay:.9s}#home.first>:nth-child(4){animation-delay:1s}#home.first>:nth-child(5){animation-delay:1.1s}#home.first>:nth-child(6){animation-delay:1.2s}#home.first>:nth-child(7){animation-delay:1.3s}
+#home.first .hero h1{animation:lgin 1.1s cubic-bezier(.65,0,.25,1) .35s both}
+#home.first .hero p{animation:up .6s cubic-bezier(.2,.8,.2,1) .9s both}
+#home.first .tile{animation:lgin .8s cubic-bezier(.65,0,.25,1) both}
+.v.enter{animation:scr .32s cubic-bezier(.2,.8,.2,1) both}
+.tile,.btn,.chip{transition:transform .15s ease}
+.tile:active,.btn:active,.chip:active{transform:scale(.97)}
+.c img{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.c:active img{transform:scale(1.06)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style></head><body>
 
 <section class="v on" id="home"></section>
@@ -70,12 +85,14 @@ let D=null;
 const $=(id)=>document.getElementById(id);
 const esc=(s)=>String(s||'').replace(/[&<>"]/g,(m)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 const fmt=(iso)=>iso.split('-').reverse().slice(0,2).join('.');
-function show(id){document.querySelectorAll('.v').forEach((v)=>v.classList.toggle('on',v.id===id));scrollTo(0,0);
+function show(id){document.querySelectorAll('.v').forEach((v)=>{v.classList.toggle('on',v.id===id);v.classList.remove('first','enter');if(v.id===id){void v.offsetWidth;v.classList.add('enter')}});animDone=true;scrollTo(0,0);
   try{id==='home'?tg.BackButton.hide():tg.BackButton.show()}catch(e){}}
 try{tg.BackButton.onClick(()=>show('home'))}catch(e){}
 const openUrl=(u)=>{try{tg.openLink(u)}catch(e){window.open(u,'_blank')}};
 
+let animDone=false,animUntil=0,animT=0;
 function home(){
+  if(!animDone&&Date.now()<animUntil){clearTimeout(animT);animT=setTimeout(home,animUntil-Date.now());return}
   const d=D&&D[L]; const today=new Date().toISOString().slice(0,10);
   const dates=d?d.tours.dates.filter((x)=>x.start>=today):[];
   const top=d?d.excursions.slice(0,3):[];
@@ -91,6 +108,9 @@ function home(){
   ${top.length?`<div class="sec">${T.exc}</div>${top.map((c,i)=>card(c,'excursions',i)).join('')}`:''}
   ${contacts()}
   ${D?`<div class="foot">${T.upd} ${new Date(D.updated).toLocaleDateString(L)}</div>`:''}`;
+  const h=$('home');
+  if(!animDone&&!animUntil){h.classList.add('first');h.querySelectorAll('.tile').forEach((t,i)=>{t.style.animationDelay=(.6+i*.12)+'s'});animUntil=Date.now()+1900}
+  else{h.classList.remove('first');animDone=true}
 }
 function wx(){const h=new Date().getHours();const [t,k]=h>=5&&h<11?[29,'m']:h<17&&h>=11?[31,'d']:h>=17&&h<22?[28,'e']:[27,'n'];
   const W={ru:{m:'Утро',d:'День',e:'Вечер',n:'Ночь',x:'Мальдивы'},en:{m:'Morning',d:'Day',e:'Evening',n:'Night',x:'Maldives'}}[L];
