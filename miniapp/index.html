@@ -94,7 +94,9 @@ const $=(id)=>document.getElementById(id);
 const esc=(s)=>String(s||'').replace(/[&<>"]/g,(m)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 const fmt=(iso)=>iso.split('-').reverse().slice(0,2).join('.');
 function show(id){document.querySelectorAll('.v').forEach((v)=>{v.classList.toggle('on',v.id===id);v.classList.remove('first','enter');if(v.id===id){void v.offsetWidth;v.classList.add('enter')}});animDone=true;scrollTo(0,0);
-  try{id==='home'?tg.BackButton.hide():tg.BackButton.show()}catch(e){}}
+  try{id==='home'?tg.BackButton.hide():tg.BackButton.show()}catch(e){}
+  /* свайп вниз сворачивает приложение — на внутренних экранах выключаем, чтобы не мешал жесту «назад» */
+  try{id==='home'?tg.enableVerticalSwipes():tg.disableVerticalSwipes()}catch(e){}}
 try{tg.BackButton.onClick(()=>show('home'))}catch(e){}
 /* Жест «назад»: свайп от левого края вправо — то же, что кнопка «Назад» Telegram */
 function edgeBack(can,cur,go){var sx=0,sy=0,act=false,lock=0,el=null,dx=0;
