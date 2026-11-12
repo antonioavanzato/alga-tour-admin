@@ -3,7 +3,7 @@ self.addEventListener('push', (event) => {
   try { data = event.data.json(); } catch (e) {}
   event.waitUntil((async () => {
     await self.registration.showNotification(data.title || '🔔 Новая заявка ALGA', {
-      body: data.body || '', tag: 'alga-booking',
+      body: data.body || '', tag: data.tag || ('alga-' + Date.now()),
       icon: '../icons/alga-white-logo.png', badge: '../icons/alga-white-logo.png',
     });
     const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
