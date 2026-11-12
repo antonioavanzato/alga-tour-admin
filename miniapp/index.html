@@ -135,7 +135,7 @@ function list(kind){const arr=kind==='resorts'?resCards():(D&&D[L][kind])||[];
 const APP_LINK='https://t.me/Alga_Maldives_bot?startapp',IG='https://instagram.com/alga_tours';
 function extras(){const ru=L==='ru';return `<div class="ex"><button type="button" class="xb" onclick="shareApp()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v6.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V12"/></svg><span>${ru?'Поделиться':'Share'}<small>${ru?'с другом':'with a friend'}</small></span></button><button type="button" class="xb" onclick="openUrl(IG)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor" stroke="none"/></svg><span>Instagram<small>@alga_tours</small></span></button></div>`}
 function shareApp(){try{tg.HapticFeedback.impactOccurred('light')}catch(e){}
-  try{if(tg&&tg.switchInlineQuery&&tg.isVersionAtLeast&&tg.isVersionAtLeast('6.7')){tg.switchInlineQuery('share',['users','groups','channels']);return}}catch(e){}
+  try{if(tg&&tg.switchInlineQuery&&tg.isVersionAtLeast&&tg.isVersionAtLeast('6.7')){tg.switchInlineQuery('Share',['users','groups','channels']);return}}catch(e){}
   const t=L==='ru'?'ALGA Maldives — экскурсии, отели и туры на Мальдивах прямо в Telegram':'ALGA Maldives — excursions, hotels and tours in the Maldives right in Telegram';
   const u='https://t.me/share/url?url='+encodeURIComponent(APP_LINK)+'&text='+encodeURIComponent(t);
   try{if(tg&&tg.openTelegramLink){tg.openTelegramLink(u);return}}catch(e){}
