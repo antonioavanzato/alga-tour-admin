@@ -83,7 +83,7 @@ details.fq summary::after{content:'+';color:var(--mu);font-size:22px;line-height
 .pbuy .pp2{flex:none;font-family:Jost;font-size:22px}.pbuy .btn{flex:1;padding:15px;border-radius:14px;background:linear-gradient(180deg,#0e5f76,#0a4150);box-shadow:0 10px 24px -10px rgba(10,65,80,.6)}
 .sh{position:fixed;inset:0;z-index:50;background:rgba(7,26,33,.5);display:flex;align-items:flex-end;opacity:0;transition:opacity .25s}.sh.in{opacity:1}
 .shc{width:100%;max-width:560px;margin:0 auto;background:var(--card);border-radius:22px 22px 0 0;padding:22px 18px calc(22px + var(--tg-safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}.sh.in .shc{transform:none}
-.shc .eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}.shc h3{font-family:Jost;font-size:22px;margin:6px 0 0}.shc .big{font-family:Jost;font-size:40px;line-height:1.1;color:var(--gc,var(--ac));margin:2px 0 6px}
+.shc .grab{width:40px;height:5px;border-radius:3px;background:var(--ln);margin:-8px auto 14px}.shc .eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}.shc h3{font-family:Jost;font-size:22px;margin:6px 0 0}.shc .big{font-family:Jost;font-size:40px;line-height:1.1;color:var(--gc,var(--ac));margin:2px 0 6px}
 .shc .hn{font-size:12px;color:var(--mu);margin:6px 0 12px}.shc .hn.e{color:#d23c3c}.shc p{color:var(--mu)}.shc .btn{margin-top:8px;padding:14px}
 .shc input.e{border-color:#d23c3c;animation:shk .4s}@keyframes shk{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
@@ -293,15 +293,20 @@ function preSave(nick,prev){let msg='Набор: '+PRE.name+' ('+PRE.price+' ₽
     .catch(()=>{clearTimeout(t);n<2?setTimeout(once,1200):fail()})};once()})}
 function preBuy(){hap();const u=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user;const w=document.createElement('div');w.className='sh';w.innerHTML='<div class="shc"></div>';const k=w.firstChild,q=(id)=>k.querySelector('#'+id);let busy=false,prev='';
   const close=()=>{w.classList.remove('in');document.body.style.overflow='';setTimeout(()=>w.remove(),300)};
-  const form=(v,h)=>{k.innerHTML=`<div class="eye">${PT.order}</div><h3>${PRE.name}</h3><div class="big">${PT.price}</div><label>${PT.tgl}</label><input id="pnick" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="@username" value="${esc(v)}"><div class="hn" id="phn">${h||PT.hn}</div><div class="err" id="perr"></div><button class="btn f" id="pgo">${PT.send}</button><button class="btn g f" id="px">${PT.cancel}</button>`;
+  const form=(v,h)=>{k.innerHTML=`<div class="grab"></div><div class="eye">${PT.order}</div><h3>${PRE.name}</h3><div class="big">${PT.price}</div><label>${PT.tgl}</label><input id="pnick" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="@username" value="${esc(v)}"><div class="hn" id="phn">${h||PT.hn}</div><div class="err" id="perr"></div><button class="btn f" id="pgo">${PT.send}</button><button class="btn g f" id="px">${PT.cancel}</button>`;
     const i=q('pnick');i.oninput=()=>{const r=i.value.replace(/^(https?:\/\/)?(www\.)?(t\.me|telegram\.me)\//i,'').replace(/^@+/,'');i.value=r?'@'+r:'';q('phn').textContent=h||PT.hn;q('phn').classList.remove('e')};
     q('px').onclick=close;q('pgo').onclick=submit};
   const submit=()=>{if(busy)return;const i=q('pnick'),v=i.value.trim();
     if(!TG_RE.test(v)){i.classList.add('e');setTimeout(()=>i.classList.remove('e'),500);q('phn').textContent=PT.hnE;q('phn').classList.add('e');hap('err');return}
     busy=true;const b=q('pgo');b.disabled=true;b.textContent=PT.sending;try{i.blur()}catch(e){}
-    preSave(v,prev).then(()=>{busy=false;hap('ok');k.innerHTML=`<div class="eye">✓</div><h3>${PT.done}</h3><p>${PT.doneS(esc(v))}</p><button class="btn f" id="pok">${PT.ok}</button><button class="btn g f" id="pfix">${PT.fix}</button>`;
+    preSave(v,prev).then(()=>{busy=false;hap('ok');k.innerHTML=`<div class="grab"></div><div class="eye">✓</div><h3>${PT.done}</h3><p>${PT.doneS(esc(v))}</p><button class="btn f" id="pok">${PT.ok}</button><button class="btn g f" id="pfix">${PT.fix}</button>`;
       q('pok').onclick=close;q('pfix').onclick=()=>{prev=v;form(v,PT.fixH)}})
     .catch(()=>{busy=false;b.disabled=false;b.textContent=PT.send;hap('err');q('perr').innerHTML=PT.err+'<a href="#" style="color:var(--aq)" onclick="try{tg.openTelegramLink(\'https://t.me/avanzato\')}catch(e){openUrl(\'https://t.me/avanzato\')};return false">@avanzato</a>'})};
+  /* Свайп вниз закрывает окно */
+  let y0=null,dy=0;k.addEventListener('touchstart',(e)=>{e.stopPropagation();if(e.target.closest('input'))return;y0=e.touches[0].clientY;dy=0;k.style.transition='none'},{passive:true});
+  k.addEventListener('touchmove',(e)=>{if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);k.style.transform='translateY('+dy+'px)';if(dy>0)e.preventDefault()},{passive:false});
+  k.addEventListener('touchend',()=>{if(y0===null)return;y0=null;k.style.transition='';if(dy>80){k.style.transform='translateY(100%)';hap();close()}else k.style.transform=''});
+  w.addEventListener('touchmove',(e)=>{if(e.target===w)e.preventDefault()},{passive:false});
   form(u&&u.username?'@'+u.username:'');w.onclick=(e)=>{if(e.target===w)close()};
   document.body.appendChild(w);document.body.style.overflow='hidden'
   requestAnimationFrame(()=>requestAnimationFrame(()=>w.classList.add('in')))}
