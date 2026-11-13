@@ -87,6 +87,13 @@ details.fq summary::after{content:'+';color:var(--mu);font-size:22px;line-height
 .shc .hn{font-size:12px;color:var(--mu);margin:6px 0 12px}.shc .hn.e{color:#d23c3c}.shc p{color:var(--mu)}.shc .btn{margin-top:8px;padding:14px}
 .shc input.e{border-color:#d23c3c;animation:shk .4s}@keyframes shk{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.ban{--st:calc(var(--tg-safe-area-inset-top,0px) + var(--tg-content-safe-area-inset-top,0px));position:relative;height:calc(420px + var(--st));margin:calc(-16px - var(--st)) -16px -110px}
+.ban img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 35%;opacity:0;transform:scale(1.06);transition:opacity 1.3s ease,transform 3s cubic-bezier(.2,.7,.2,1);-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 60%,rgba(0,0,0,.82) 70%,rgba(0,0,0,.55) 79%,rgba(0,0,0,.28) 88%,rgba(0,0,0,.08) 95%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,#000 60%,rgba(0,0,0,.82) 70%,rgba(0,0,0,.55) 79%,rgba(0,0,0,.28) 88%,rgba(0,0,0,.08) 95%,transparent 100%)}
+.ban img.ok{opacity:1;transform:none}
+.ban .hero{position:absolute;left:16px;right:16px;top:calc(var(--st) + 22px);margin:0;padding:0;border-radius:0;background:none;text-shadow:0 1px 14px rgba(0,25,35,.45)}
+.ban .tiles,.ban~.tiles{position:relative}
+#home>.tiles{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.ban img{transform:none;transition:opacity .4s}}
 </style></head><body>
 
 <section class="v on" id="home"></section>
@@ -144,7 +151,7 @@ function home(){
   const d=D&&D[L]; const today=new Date().toISOString().slice(0,10);
   const dates=d?d.tours.dates.filter((x)=>x.start>=today):[];
   const top=d?d.excursions.slice(0,3):[];
-  $('home').innerHTML=`<div class="hero hw"><div class="ht"><h1>${T.hi}</h1><p>${T.sub}</p></div>${wx()}</div>
+  $('home').innerHTML=`<div class="ban"><img src="hero.jpg" alt="" fetchpriority="high" class="${window.heroOk?'ok':''}" onload="window.heroOk=1;this.classList.add('ok')"><div class="hero hw"><div class="ht"><h1>${T.hi}</h1><p>${T.sub}</p></div>${wx()}</div></div>
   <div class="tiles">
    <div class="tile w hot" onclick="openForm('author')"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg></i><span class="shn"></span><span class="hit">${T.hit}</span><b>${T.tour}</b><small>${T.tourS}</small><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
    <div class="tile" onclick="list('excursions')"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c3-5 8-7 13-5l5-3v16l-5-3c-5 2-10 0-13-5z"/><path d="M15 11h.01"/></svg></i><b>${T.exc}</b><small>${T.excS}</small></div>
