@@ -109,7 +109,7 @@ details.fq summary::after{content:'+';color:var(--mu);font-size:22px;line-height
 .xg{list-style:none;margin:0;padding:0 0 0 6px;border-left:2px solid color-mix(in srgb,var(--aq) 40%,transparent)}.xg li{position:relative;padding:0 0 12px 18px;font-size:14px}.xg li::before{content:'';position:absolute;left:-7px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--aq)}.xg b{display:block;font-family:Jost;font-size:15px;color:var(--gc,var(--ac))}.xg b:empty{display:none}
 .xn{margin:12px 0 0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--aq) 12%,transparent);font-size:13px}
 .xgal{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px;scrollbar-width:none}.xgal::-webkit-scrollbar{display:none}.xgal img{flex:none;width:78%;height:200px;object-fit:cover;border-radius:14px;scroll-snap-align:center;background:var(--ln);cursor:zoom-in}
-.xtr{margin-top:18px}.xtr p b{color:var(--tx)}
+.xtr{margin-top:18px}.xtr+.xtr{margin-top:0}.xtr .xg{margin-bottom:14px}.xtr p b{color:var(--tx)}
 .xz{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center}.xz img{max-width:100%;max-height:100%;object-fit:contain}.xzc{position:absolute;bottom:calc(20px + var(--tg-safe-area-inset-bottom,0px));left:0;right:0;text-align:center;color:#fff;font-size:13px;opacity:.8}.xzx{position:absolute;top:calc(14px + var(--tg-safe-area-inset-top,0px) + var(--tg-content-safe-area-inset-top,0px));right:14px;width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:26px;line-height:1}
 .hs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px 10px;padding:0 16px 2px}.hs::-webkit-scrollbar{display:none}.hs .chip{flex:none}.hsn{font-weight:600;margin-bottom:10px}.hpr{width:100%;display:block;border-radius:16px;border:1px solid var(--ln);background:#fff;cursor:zoom-in}.hhint{font-size:12px;color:var(--mu);text-align:center;margin-top:6px}
 .tile.hot{min-height:178px;background-size:cover;background-position:center;display:flex;flex-direction:column;justify-content:flex-end}.tile.hot b{font-size:25px}.tile.hot i{position:absolute;left:18px;top:18px;margin:0}
@@ -407,12 +407,12 @@ function openExc(i){const c=((D&&D[L].excursions)||[])[i];if(!c)return;const X=X
   <div class="xh">${c.img?`<img src="${esc(c.img)}" alt="">`:''}<div class="xht"><div class="l">${esc(c.label)}</div><h2>${esc(c.title)}</h2><div class="xtm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>${esc(x.time)}</div></div></div>
   <p class="lede">${esc(c.text)}</p>
   <div class="sec">${XT.prices}</div><div class="xp">${pr.map((p)=>`<div><span>${esc(p[0])}</span><b>${esc(p[1])}</b></div>`).join('')}</div>
+  ${X.gal&&X.gal.length?`<div class="sec">${XT.gal}</div><div class="xgal">${X.gal.map((g,k)=>`<img src="${esc(g[0])}" alt="" loading="lazy" onclick="xZoom(${i},${k})">`).join('')}</div>`:''}
   <div class="sec">${XT.places}</div>${li(x.places)}
-  <div class="sec">${XT.prog}</div><ol class="xg">${x.prog.map((p)=>`<li><b>${esc(p[0])}</b><span>${esc(p[1])}</span></li>`).join('')}</ol>
   <div class="sec">${XT.inc}</div>${li(x.inc)}
   ${x.exc?`<div class="sec">${XT.exc}</div>${li(x.exc,' no')}`:''}
   ${(x.notes||[]).map((n)=>`<p class="xn">${esc(n)}</p>`).join('')}
-  ${X.gal&&X.gal.length?`<div class="sec">${XT.gal}</div><div class="xgal">${X.gal.map((g,k)=>`<img src="${esc(g[0])}" alt="" loading="lazy" onclick="xZoom(${i},${k})">`).join('')}</div>`:''}
+  <details class="fq xtr"><summary>${XT.prog}</summary><ol class="xg">${x.prog.map((p)=>`<li><b>${esc(p[0])}</b><span>${esc(p[1])}</span></li>`).join('')}</ol></details>
   <details class="fq xtr"><summary>${XT.terms}</summary>${XTERMS[L].map((t)=>`<p><b>${esc(t[0])}.</b> ${esc(t[1])}</p>`).join('')}</details>
   ${tourPromo()}<button class="btn g f" style="margin-top:14px" onclick="openUrl('${esc(c.url)}')">${XT.site}</button>
   ${contacts()}
@@ -436,11 +436,11 @@ function openHotel(i){const c=((D&&D[L].hotels)||[])[i];if(!c)return;const H=HD[
   $('xd').innerHTML=`<button class="back" onclick="show(hFrom)">${T.back}</button>
   <div class="xh">${c.img?`<img src="${esc(c.img)}" alt="">`:''}<div class="xht"><div class="l">${esc(c.label)}</div><h2>${esc(c.title)}</h2></div></div>
   <p class="lede">${esc(c.text)}</p>
+  ${H.gal.length?`<div class="sec">${HT.gal}</div><div class="xgal">${H.gal.map((g,k)=>`<img src="${esc(g)}" alt="" loading="lazy" onclick="hZoom(${i},${k})">`).join('')}</div>`:''}
   <div class="sec">${HT.seas}</div>
   ${H.seasons.length>1?`<div class="chips hs">${H.seasons.map((s,k)=>`<span class="chip${k?'':' on'}" onclick="hSeason(${i},${k},this)">${esc(s[L])}</span>`).join('')}</div>`:`<div class="hsn">${esc(H.seasons[0][L])}</div>`}
   <img class="hpr" id="hpr" src="${esc(H.seasons[0].img)}" alt="" onclick="hZoom(${i})"><div class="hhint">${HT.hint}</div>
   <div class="sec">${HT.pay}</div>${HTERMS.map((t)=>`<p class="xn">${esc(t)}</p>`).join('')}
-  ${H.gal.length?`<div class="sec">${HT.gal}</div><div class="xgal">${H.gal.map((g,k)=>`<img src="${esc(g)}" alt="" loading="lazy" onclick="hZoom(${i},${k})">`).join('')}</div>`:''}
   ${tourPromo()}<button class="btn g f" style="margin-top:14px" onclick="openUrl('${esc(c.url)}')">${XT.site}</button>
   ${contacts()}
   <div class="pbuy"><button class="btn" onclick="openForm('hotel',${i})">${T.book} →</button></div>`;
