@@ -343,7 +343,7 @@ let xFrom='home';
 const xSlug=(c)=>c.url.toLowerCase().replace(/\/+$/,'').split('/').pop();
 function openExc(i){const c=((D&&D[L].excursions)||[])[i];if(!c)return;const X=XD[xSlug(c)],x=X&&X[L];if(!x){openUrl(c.url);return}
   hap();xFrom=document.querySelector('.v.on').id;const li=(a,cl)=>`<ul class="xl${cl||''}">${a.map((t)=>`<li>${esc(t)}</li>`).join('')}</ul>`;
-  const pr=[[XT.adult,c.price||'']].filter((p)=>p[1]);
+  const pr=[[XT.adult,c.price||''],...x.prices.filter((p)=>/дрон|drone/i.test(p[0]))].filter((p)=>p[1]);
   $('xd').innerHTML=`<button class="back" onclick="show(xFrom)">${T.back}</button>
   <div class="xh">${c.img?`<img src="${esc(c.img)}" alt="">`:''}<div class="xht"><div class="l">${esc(c.label)}</div><h2>${esc(c.title)}</h2><div class="xtm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>${esc(x.time)}</div></div></div>
   <p class="lede">${esc(c.text)}</p>
