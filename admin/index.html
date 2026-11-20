@@ -430,10 +430,7 @@ function beep() {
 
 function notifyNew(b) {
   beep();
-  if ('Notification' in window && Notification.permission === 'granted') {
-    const txt = (b.fio || 'Без имени') + ' · ' + (TYPE_LABEL[b.service_type] || '');
-    try { new Notification('🔔 Новая заявка ALGA', { body: txt, tag: 'alga-booking' }); } catch (e) {}
-  }
+  // Системное уведомление присылает сервер (push) — здесь только звук, чтобы не было дубля
 }
 
 $('loginBtn').addEventListener('click', doLogin);
