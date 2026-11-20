@@ -3,8 +3,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>ALGA Maldives</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+/* Шрифты лежат рядом — без Google Fonts, открывается в России без VPN */
+@font-face{font-family:Manrope;font-weight:200 800;font-display:swap;src:url(manrope-cyrillic.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:Manrope;font-weight:200 800;font-display:swap;src:url(manrope-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:Jost;font-weight:100 900;font-display:swap;src:url(jost-cyrillic.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:Jost;font-weight:100 900;font-display:swap;src:url(jost-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 :root{--ac:#0e5f76;--aq:#2bbdee;--bg:#f4f8fa;--card:#fff;--tx:#0f2730;--mu:#5d7480;--ln:#dbe6ea}
 @media (prefers-color-scheme:dark){:root{--bg:#071a21;--card:#0d2730;--tx:#e9f4f7;--mu:#8fb0bb;--ln:#1d3d48;--gc:#7fd6f2}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -16,7 +18,7 @@ h1,h2{font-family:Jost,sans-serif;margin:4px 0 12px}h1{font-size:28px}h2{font-si
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .tile{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:14px;cursor:pointer;min-height:96px}
 .tile b{display:block;font-family:Jost;font-size:17px}.tile small{color:var(--mu)}.tile i{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;margin-bottom:8px;color:var(--aq);background:color-mix(in srgb,var(--aq) 13%,transparent)}.tile i svg{width:24px;height:24px}.okic{display:inline-flex;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.22);align-items:center;justify-content:center;vertical-align:-6px;margin-right:10px}.okic svg{width:22px;height:22px}
-.fimg{width:100%;height:190px;object-fit:cover;border-radius:16px;margin:4px 0 12px;display:block;background:var(--ln)}.fimg{width:100%;height:190px;object-fit:cover;border-radius:16px;margin:4px 0 12px;display:block;background:var(--ln)}.cw{position:relative}.cw input,.cw textarea{padding-right:40px}.clr{position:absolute;right:8px;top:10px;width:28px;height:28px;border:0;border-radius:50%;background:color-mix(in srgb,var(--mu) 22%,transparent);color:var(--tx);display:none;align-items:center;justify-content:center;padding:0;cursor:pointer}.clr svg{width:14px;height:14px}.tile.w{grid-column:span 2}.tile.hot{position:relative;background:linear-gradient(135deg,#0e5f76,#0a4150);border:0;color:#fff;padding:18px;box-shadow:0 14px 30px -16px rgba(10,65,80,.7)}.tile.hot b{font-size:21px}.tile.hot small{color:#d7f1fb}.tile.hot i{color:#fff;background:rgba(255,255,255,.16)}.hit{position:absolute;right:14px;top:14px;background:#2bbdee;color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:99px}
+.fimg{width:100%;height:190px;object-fit:cover;border-radius:16px;margin:4px 0 12px;display:block;background:var(--ln)}.cw{position:relative}.cw input,.cw textarea{padding-right:40px}.clr{position:absolute;right:8px;top:10px;width:28px;height:28px;border:0;border-radius:50%;background:color-mix(in srgb,var(--mu) 22%,transparent);color:var(--tx);display:none;align-items:center;justify-content:center;padding:0;cursor:pointer}.clr svg{width:14px;height:14px}.tile.w{grid-column:span 2}.tile.hot{position:relative;background:linear-gradient(135deg,#0e5f76,#0a4150);border:0;color:#fff;padding:18px;box-shadow:0 14px 30px -16px rgba(10,65,80,.7)}.tile.hot b{font-size:21px}.tile.hot small{color:#d7f1fb}.tile.hot i{color:#fff;background:rgba(255,255,255,.16)}.hit{position:absolute;right:14px;top:14px;background:#2bbdee;color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:99px}
 .sec{margin:20px 0 8px;font-family:Jost;font-size:18px}
 .c{background:var(--card);border:1px solid var(--ln);border-radius:16px;overflow:hidden;margin-bottom:12px}
 .c img{width:100%;height:170px;object-fit:cover;display:block;background:var(--ln)}
@@ -127,6 +129,8 @@ const optFor=(list,c)=>{const k=c.url.toLowerCase().split('/').pop();const f=lis
 let D=null;
 const $=(id)=>document.getElementById(id);
 const esc=(s)=>String(s||'').replace(/[&<>"]/g,(m)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+/* сегодня по часам телефона, а не по Гринвичу */
+const todayL=()=>{const x=new Date();return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
 const fmt=(iso)=>iso.split('-').reverse().slice(0,2).join('.');
 function show(id){document.querySelectorAll('.v').forEach((v)=>{v.classList.toggle('on',v.id===id);v.classList.remove('first','enter');if(v.id===id){void v.offsetWidth;v.classList.add('enter')}});animDone=true;scrollTo(0,0);
   try{id==='home'?tg.BackButton.hide():tg.BackButton.show()}catch(e){}
@@ -148,7 +152,7 @@ const openUrl=(u)=>{try{tg.openLink(u)}catch(e){window.open(u,'_blank')}};
 let animDone=false,animUntil=0,animT=0;
 function home(){
   if(!animDone&&Date.now()<animUntil){clearTimeout(animT);animT=setTimeout(home,animUntil-Date.now());return}
-  const d=D&&D[L]; const today=new Date().toISOString().slice(0,10);
+  const d=D&&D[L]; const today=todayL();
   const dates=d?d.tours.dates.filter((x)=>x.start>=today):[];
   const top=d?d.excursions.slice(0,3):[];
   $('home').innerHTML=`<div class="ban"><img src="hero.jpg" alt="" fetchpriority="high" class="${window.heroOk?'ok':''}" onload="window.heroOk=1;this.classList.add('ok')"><div class="hero hw"><div class="ht"><h1>${T.hi}</h1><p>${T.sub}</p></div>${wx()}</div></div>
@@ -191,7 +195,7 @@ function shareApp(){try{tg.HapticFeedback.impactOccurred('light')}catch(e){}
 function contacts(){return `<div class="sec">${T.ask}</div><div class="ct"><a class="btn g" href="#" onclick="openUrl('https://wa.me/79154534754');return false">WhatsApp</a><a class="btn g" href="#" onclick="try{tg.openTelegramLink('https://t.me/katerinamaldives')}catch(e){openUrl('https://t.me/katerinamaldives')};return false">Telegram</a></div>`}
 
 let KIND='excursion';
-function openForm(kind,idx,ds,de){KIND=kind;const d=D&&D[L];const today=new Date().toISOString().slice(0,10);
+function openForm(kind,idx,ds,de){KIND=kind;const d=D&&D[L];const today=todayL();
   const sel=(name,opts,pick)=>`<select name="${name}">${opts.map(([v,t])=>`<option value="${esc(v)}"${v===pick?' selected':''}>${esc(t)}</option>`).join('')}</select>`;
   const n=(name)=>`<input name="${name}" type="number" min="1" value="2" inputmode="numeric">`;
   const dayN=(n)=>{const x=new Date();x.setDate(x.getDate()+n);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
@@ -240,7 +244,7 @@ async function send(ev){ev.preventDefault();const f=$('f'),err=$('err'),b=$('sb'
   const u=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user;
   if(u&&u.username)fd.set('important_notes',(String(fd.get('important_notes')||'')+`\nTelegram: @${u.username}`).trim());
   b.disabled=true;b.textContent=T.sending;
-  try{const r=await fetch(ENDPOINT,{method:'POST',body:new URLSearchParams(fd)});if(!r.ok)throw 0;
+  try{const ac=new AbortController(),to=setTimeout(()=>ac.abort(),20000);const r=await fetch(ENDPOINT,{method:'POST',body:new URLSearchParams(fd),signal:ac.signal}).finally(()=>clearTimeout(to));if(!r.ok)throw 0;
     $('done').innerHTML=`<div class="hero"><h1><span class="okic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${T.ok}</h1><p>${T.okS}</p></div><button class="btn f" onclick="try{tg.close()}catch(e){show('home')}">${T.close}</button>${contacts()}`;show('done');
     try{tg.HapticFeedback.notificationOccurred('success')}catch(e){}}
   catch(e){err.textContent=T.fail}finally{b.disabled=!$('agree').checked;b.textContent=T.send}return false}
