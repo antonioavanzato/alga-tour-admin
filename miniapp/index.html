@@ -149,6 +149,8 @@ details.dvp{background:var(--card);border:1px solid var(--ln);border-radius:16px
 const ENDPOINT='https://functions.yandexcloud.net/d4es0egg4car1h5d62n0';
 const KEY='Alga9f230f63!';
 const tg=window.Telegram&&Telegram.WebApp; try{tg.ready();tg.expand()}catch(e){}
+/* На телефоне всегда полный экран — и с кнопки «Открыть» в чате, и по ссылке, и из меню бота (Bot API 8.0+). На компьютере обычное окно */
+try{if(tg&&tg.isVersionAtLeast&&tg.isVersionAtLeast('8.0')&&/^(ios|android)/.test(tg.platform||'')&&!tg.isFullscreen)tg.requestFullscreen()}catch(e){}
 /* полноэкранный режим Telegram: погода уходит в полосу между «Закрыть» и «Свернуть» */
 function fsMode(){try{const t=(tg&&tg.contentSafeAreaInset&&tg.contentSafeAreaInset.top)||parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tg-content-safe-area-inset-top'))||0;document.body.classList.toggle('fs',t>20)}catch(e){}}
 try{tg.onEvent('contentSafeAreaChanged',fsMode);tg.onEvent('fullscreenChanged',fsMode)}catch(e){}
