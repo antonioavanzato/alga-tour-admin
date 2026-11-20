@@ -256,7 +256,7 @@ function shareApp(){try{tg.HapticFeedback.impactOccurred('light')}catch(e){}
 function contacts(){return `<div class="sec">${T.ask}</div><div class="ct"><a class="btn g" href="#" onclick="openUrl('https://wa.me/79154534754');return false">WhatsApp</a><a class="btn g" href="#" onclick="try{tg.openTelegramLink('https://t.me/katerinamaldives')}catch(e){openUrl('https://t.me/katerinamaldives')};return false">Telegram</a></div>`}
 
 let KIND='excursion';
-function openForm(kind,idx,ds,de,pre){KIND=kind;const d=D&&D[L];const today=todayL();
+function openForm(kind,idx,ds,de,pre){KIND=kind;if(kind==='author'&&!ds){const nx=nextTour();if(nx){ds=nx.start;de=nx.end}}const d=D&&D[L];const today=todayL();
   const sel=(name,opts,pick)=>`<select name="${name}">${opts.map(([v,t])=>`<option value="${esc(v)}"${v===pick?' selected':''}>${esc(t)}</option>`).join('')}</select>`;
   const n=(name)=>`<input name="${name}" type="number" min="1" value="2" inputmode="numeric">`;
   const dayN=(n)=>{const x=new Date();x.setDate(x.getDate()+n);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
@@ -265,7 +265,7 @@ function openForm(kind,idx,ds,de,pre){KIND=kind;const d=D&&D[L];const today=toda
   if(kind==='excursion'){title=T.exc;const cs=(d&&d.excursions)||[];const opts=cs.map((c)=>[optFor(EXC_OPT,c),c.title]);if(!opts.length)EXC_OPT.forEach(([,v])=>opts.push([v,v]));
     f=`<label>${T.choose}</label>${sel('excursion',opts,opts[idx||0]&&opts[idx||0][0])}<label>${T.date}</label>${dt('excursion_date')}<label>${T.people}</label>${n('people_count')}`}
   if(kind==='hotel'){title=T.hot;const cs=(d&&d.hotels)||[];const opts=cs.map((c)=>[optFor(HOT_OPT,c),c.title]);if(!opts.length)HOT_OPT.forEach(([,v])=>opts.push([v,v]));
-    f=`<label>${T.choose}</label>${sel('hotel_booking',opts,opts[idx||0]&&opts[idx||0][0])}<div class="two"><div><label>${T.ci}</label>${dt('check_in_date')}</div><div><label>${T.co}</label>${dt('check_out_date')}</div></div><div class="two"><div><label>${T.rooms}</label><input name="room_count" type="number" min="1" value="1"></div><div><label>${T.guests}</label>${n('hotel_guests')}</div></div>`}
+    f=`<label>${T.choose}</label>${sel('hotel_booking',opts,opts[idx||0]&&opts[idx||0][0])}<div class="two"><div><label>${T.ci}</label>${dt('check_in_date',ds)}</div><div><label>${T.co}</label>${dt('check_out_date',de)}</div></div><div class="two"><div><label>${T.rooms}</label><input name="room_count" type="number" min="1" value="1"></div><div><label>${T.guests}</label>${n('hotel_guests')}</div></div>`}
   if(kind==='resort'){title=T.res;f=`<label>${T.choose}</label>${sel('resort_excursion',RESORTS.map((r,i)=>[r,RES_TXT[L][i][1]]),RESORTS[idx||0])}<label>${T.date}</label>${dt('resort_date')}<label>${T.people}</label>${n('resort_people_count')}`}
   if(kind==='author'){title=T.tour;const ds2=(d?d.tours.dates.filter((x)=>x.start>=today):[]);
     f=`<img class="fimg" src="https://i.wfolio.ru/x/cXPZPmu9lCw5tkRNat7JtyHjrPiZiclN/VJgIrluFLtZWGwzaT5FJ07DuSK__bTQA/RI06mXokaoiN9JjePZRzOBoOpweD4Lor/E-hlRBeAvBuGNhxqH90upws3kp0Ga8oy/Fsq1FlEAumR7Bk04CkjyoQ.jpg" alt=""><input type="hidden" name="author_tour" value="Авторский тур Маафуши">${ds2.length?`<label>${T.near}</label><div class="dg" id="tdates">${ds2.map((x,i)=>dCard(x,i,ds2.length,`pickTour(this,'${x.start}','${x.end}')`,x.start===ds?' on':'')).join('')}</div>`:''}
@@ -460,8 +460,18 @@ function openHotel(i){const c=((D&&D[L].hotels)||[])[i];if(!c)return;const H=HD[
   <div class="sec">${HT.pay}</div>${HTERMS.map((t)=>`<p class="xn">${esc(t)}</p>`).join('')}
   ${tourPromo()}<button class="btn g f" style="margin-top:14px" onclick="openUrl('${esc(c.url)}')">${XT.site}</button>
   ${contacts()}
-  <div class="pbuy"><button class="btn" onclick="openForm('hotel',${i})">${T.book} →</button></div>`;
+  <div class="pbuy"><button class="btn" onclick="hBook(${i})">${T.book} →</button></div>`;
   show('xd')}
+/* Сезон отеля → даты в форме: «November 1 – December 20, 2026» → 2026-11-01 … 2026-12-20 */
+function hRange(t){const M={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+  const m=String(t).toLowerCase().match(/([a-z]{3})[a-z]*\.?\s+(\d{1,2})\D+?([a-z]{3})[a-z]*\.?\s+(\d{1,2}),?\s+(20\d\d)/);if(!m||!M[m[1]]||!M[m[3]])return null;
+  const y2=+m[5],y1=M[m[1]]>M[m[3]]?y2-1:y2,p=(x)=>String(x).padStart(2,'0');
+  return [y1+'-'+p(M[m[1]])+'-'+p(m[2]),y2+'-'+p(M[m[3]])+'-'+p(m[4])]}
+function hBook(i){const H=HD[xSlug(D[L].hotels[i])],r=H&&H.seasons[hCur]&&hRange(H.seasons[hCur].en);
+  if(!r){openForm('hotel',i);return}const add=(d,n)=>{const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+  const tom=add(todayL(),1);if(r[1]<=tom){openForm('hotel',i);return}
+  const ci=r[0]>tom?r[0]:tom,co=add(ci,7)<r[1]?add(ci,7):r[1];
+  openForm('hotel',i,ci,co)}
 function hSeason(i,k,el){hCur=k;document.querySelectorAll('.hs .chip').forEach((c)=>c.classList.toggle('on',c===el));$('hpr').src=HD[xSlug(D[L].hotels[i])].seasons[k].img;hap()}
 /* Увеличение: таблица цен текущего сезона или фото галереи */
 function hZoom(i,k){const H=HD[xSlug(D[L].hotels[i])];const g=k==null?H.seasons.map((s)=>s.img):H.gal;let n=k==null?hCur:k;const w=document.createElement('div');w.className='xz';
