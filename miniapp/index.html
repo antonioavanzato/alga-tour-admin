@@ -57,7 +57,7 @@ textarea{min-height:70px}.two{display:grid;grid-template-columns:minmax(0,1fr) m
 #home.first .tile{animation:lgin .8s cubic-bezier(.65,0,.25,1) both}
 .v.enter{animation:scr .32s cubic-bezier(.2,.8,.2,1) both}
 .tile,.btn,.chip{transition:transform .15s ease}
-.tile:active,.btn:active,.chip:active{transform:scale(.97)}
+.tile:active,.btn:active,.chip:active{transform:scale(.97)}.c.tap{cursor:pointer;transition:transform .15s ease}.c.tap:active:not(:has(.btn:active)){transform:scale(.985)}
 .c img{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
 .c:active img{transform:scale(1.06)}
 .ex{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
@@ -238,7 +238,7 @@ function wx(){const h=new Date().getHours();const [t,k]=h>=5&&h<11?[29,'m']:h<17
   const W={ru:{m:'Утро',d:'День',e:'Вечер',n:'Ночь',x:'Мальдивы'},en:{m:'Morning',d:'Day',e:'Evening',n:'Night',x:'Maldives'}}[L];
   const ic=k==='e'?'<path d="M17 18a5 5 0 0 0-10 0"/><path d="M12 9V2M4.2 10.2l1.4 1.4M1 18h2M21 18h2M18.4 11.6l1.4-1.4M23 22H1"/>':k==='n'?'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
   return `<div class="wxs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ic}</svg><b>+${t}°</b><span>·</span>${W[k]}<span>·</span>${W.x}</div><div class="wx"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ic}</svg><b>+${t}°</b></span><small>${W[k]}<br>${W.x}</small></div>`}
-function card(c,kind,i){return `<div class="c">${c.img?`<img src="${esc(c.img)}" alt="" loading="lazy">`:''}<div class="b">
+function card(c,kind,i){return `<div class="c tap" onclick="if(!event.target.closest('button,a'))this.querySelector('.acts .btn.g').click()">${c.img?`<img src="${esc(c.img)}" alt="" loading="lazy">`:''}<div class="b">
   <div class="l">${esc(c.label)}</div><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>
   <div class="pr">${c.price?`<small>${T.from}</small> ${esc(c.price)} <small>${T.pp}</small>${c.kids?`<br><small>${esc(c.kids)}</small>`:''}`:''}</div>
   <div class="acts"><button class="btn g" onclick="${kind==='excursions'&&XD[xSlug(c)]?`openExc(${i})`:kind==='hotels'&&HD[xSlug(c)]?`openHotel(${i})`:kind==='resorts'?`openResort(${i})`:`openUrl('${esc(c.url)}')`}">${T.more}</button> <button class="btn" onclick="openForm('${kind==='hotels'?'hotel':kind==='resorts'?'resort':'excursion'}',${i})">${T.book}</button></div></div></div>`}
