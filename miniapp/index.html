@@ -121,7 +121,7 @@ details.dvp{background:var(--card);border:1px solid var(--ln);border-radius:16px
 @keyframes rot{to{transform:rotate(360deg)}}.tile.hot .nx{margin-right:84px;white-space:nowrap}
 .pba{position:absolute!important;inset:0;z-index:0;overflow:hidden}.pba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
 .pba .aft{animation:pbc 5s ease-in-out infinite}.pba .pln{position:absolute;top:0;bottom:0;left:0;width:2px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.8);animation:pbl 5s ease-in-out infinite}
-.pba .pl{position:absolute;bottom:10px;font:700 10px Manrope;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(7,26,33,.5);padding:3px 8px;border-radius:99px;font-style:normal}.pba .pl.a{right:10px;animation:pfa 5s ease-in-out infinite}.pba .pl.b{right:10px;animation:pfb 5s ease-in-out infinite}
+.pba .pl{position:absolute;bottom:10px;font:700 10px Manrope;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(7,26,33,.5);padding:3px 8px;border-radius:99px;font-style:normal}.pba .pl.a{right:10px;animation:pfa 5s ease-in-out infinite}.pba .pl.b{right:10px;animation:pfb 5s ease-in-out infinite}.first .pba .aft,.first .pba .pln,.first .pba .pl{animation-delay:2.3s;animation-fill-mode:backwards}
 @keyframes pbc{0%,12%{clip-path:inset(0 0 0 100%)}45%,62%{clip-path:inset(0 0 0 0)}95%,100%{clip-path:inset(0 0 0 100%)}}
 @keyframes pbl{0%,12%{left:100%}45%,62%{left:0}95%,100%{left:100%}}
 @keyframes pfa{0%,25%,85%,100%{opacity:1}35%,75%{opacity:0}}@keyframes pfb{0%,25%,85%,100%{opacity:0}35%,75%{opacity:1}}
@@ -270,7 +270,7 @@ function openForm(kind,idx,ds,de,pre){KIND=kind;const d=D&&D[L];const today=toda
   formRestore(kind,idx!=null,!!ds);
   if(pre)$('f').important_notes.value=(L==='ru'?'Программа: ':'Program: ')+pre;
   $('f').addEventListener('input',()=>formSave(kind));$('f').addEventListener('change',()=>formSave(kind));
-  addClear();if($('f').departure_island.value==='other')$('f').isl_other.parentNode.style.display='block';show('form')}
+  addClear();if($('f').departure_island.value==='other')$('f').isl_other.parentNode.style.display='block';flapDates($('form'));show('form')}
 /* Незаконченная заявка сохраняется на телефоне: имя, телефон, остров, пожелания — общие; даты, люди, выбор — для каждого вида брони */
 const FCOM=['fio','phone','departure_island','isl_other','private_transfer','important_notes'];
 const fGet=(k)=>{try{return JSON.parse(localStorage.getItem('alga_f_'+k)||'{}')}catch(e){return{}}};
