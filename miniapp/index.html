@@ -136,7 +136,126 @@ details.dvp{background:var(--card);border:1px solid var(--ln);border-radius:16px
 @keyframes pfa{0%,25%,85%,100%{opacity:1}35%,75%{opacity:0}}@keyframes pfb{0%,25%,85%,100%{opacity:0}35%,75%{opacity:1}}
 #home .tile.hot,#home .tile.ph,#home .tile.pre{border:1px solid var(--ln)}#home .tile.pre::after{content:'';position:absolute;inset:0;z-index:3;border-radius:inherit;pointer-events:none}
 .tile.pre::before{z-index:1;background:linear-gradient(90deg,rgba(7,26,33,.85),rgba(7,26,33,.25) 55%,transparent 75%)}.tile.pre>*:not(.pba){z-index:2}
-</style></head><body>
+</style><style>
+/* ═══ «Задать вопрос» ═══ */
+.aqb{position:relative;overflow:hidden;display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:12px;width:100%;margin:10px 0 0;padding:14px;border:1px solid var(--ln);border-radius:16px;background:var(--card);color:var(--tx);text-align:left;font:inherit;cursor:pointer;transition:transform .2s}
+.aqb:active{transform:scale(.98)}
+.aqb i{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;color:var(--aq);background:color-mix(in srgb,var(--aq) 13%,transparent);animation:aqbob 3.2s ease-in-out infinite}
+.aqb i svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.aqb b{display:block;font-family:Jost,sans-serif;font-size:17px}
+.aqb small{display:block;color:var(--mu);font-size:13px}
+.aqb em{font-style:normal;color:var(--aq);font-size:20px;animation:aqarr 3.2s ease-in-out infinite}
+.aqb::after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:45%;background:linear-gradient(100deg,transparent,color-mix(in srgb,var(--aq) 16%,transparent),transparent);transform:skewX(-18deg);animation:aqgl 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes aqgl{0%,55%{left:-60%}85%,100%{left:130%}}
+@keyframes aqbob{0%,100%{transform:translateY(0) rotate(0)}12%{transform:translateY(-2px) rotate(-6deg)}24%{transform:translateY(0) rotate(0)}}
+@keyframes aqarr{0%,60%,100%{transform:translateX(0)}75%{transform:translateX(4px)}}
+.aqw{position:fixed;inset:0;z-index:90;overscroll-behavior:contain}.aqw[hidden]{display:none}
+.aqbg{position:absolute;inset:0;background:rgba(4,20,26,.5);animation:aqf .25s ease}
+.aqs{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;height:86vh;max-width:560px;margin:0 auto;background:var(--bg);border-radius:22px 22px 0 0;padding:16px 16px calc(12px + env(safe-area-inset-bottom));animation:aqu .32s cubic-bezier(.2,.8,.2,1)}
+.aqs.drag{animation:none;transition:none}.aqs.back{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+@keyframes aqf{from{opacity:0}}@keyframes aqu{from{transform:translateY(100%)}}
+.aqg{display:block;width:40px;height:5px;margin:-6px auto 10px;border-radius:9px;background:var(--ln);flex:none}
+.aqh{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--ln);touch-action:none}
+.aqh b{display:block;font-family:Jost,sans-serif;font-size:19px}
+.aqh small{display:block;margin-top:2px;font-size:12px;color:var(--mu)}
+.aqh button{flex:none;display:flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:var(--card);color:var(--tx);line-height:0;cursor:pointer}
+.aql{flex:1;overflow-y:auto;padding:14px 0;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch}
+.aqm{max-width:86%;padding:10px 13px;border-radius:16px;font-size:14.5px;line-height:1.45;white-space:pre-line}
+.aqm.u{align-self:flex-end;background:var(--ac);color:#fff;border-bottom-right-radius:6px}
+.aqm.a{align-self:flex-start;background:var(--card);border:1px solid var(--ln);border-bottom-left-radius:6px}
+.aqm.t{color:var(--mu);letter-spacing:.2em}
+.aqm .ga{display:inline-block;margin-top:10px;padding:8px 14px;border:0;border-radius:99px;background:var(--aq);color:#04202a;font:600 13px Manrope,system-ui,sans-serif;cursor:pointer}
+.aqq{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}.aqq::-webkit-scrollbar{display:none}
+.aqq button{flex:none;padding:8px 12px;border:1px solid var(--ln);border-radius:99px;background:var(--card);color:var(--tx);font:13px Manrope,system-ui,sans-serif;cursor:pointer}
+.aqf{display:flex;gap:8px;align-items:center}
+.aqf input{flex:1;min-width:0;height:46px;padding:0 14px;border:1px solid var(--ln);border-radius:14px;background:var(--card);color:var(--tx);font:16px Manrope,system-ui,sans-serif}
+.aqf button{flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:46px;padding:0;border:0;border-radius:50%;background:var(--aq);color:#04202a;line-height:0;cursor:pointer;transition:opacity .2s,transform .15s}
+.aqf button:disabled{opacity:.3}.aqf button:active{transform:scale(.92)}
+@media (prefers-reduced-motion:reduce){.aqb i,.aqb em,.aqb::after{animation:none}}
+</style>
+<script>
+/* ═══ «Задать вопрос» — готовые ответы по ключевым словам (тексты с alga-tour.com).
+   Править ответы: массив AFAQ. k — корни слов (ищутся с начала слова, вес = длина), w — общие слова (вес 1),
+   req — без этих слов тема не выбирается, go — кнопка-переход. ═══ */
+var AFAQ=[
+ {id:'hi',k:['привет','здравств','добрый','доброе','доброго','hello','хай'],a:'Здравствуйте! Подскажу по экскурсиям, резортам, отелям, авторскому туру, дайвингу и оплате. Спросите своими словами или выберите вопрос ниже 👇'},
+ {id:'thx',k:['спасиб','благодар'],a:'Пожалуйста! Если появятся ещё вопросы — пишите.'},
+ {id:'exc',k:['какие экскурс','какие есть экскурс','список экскурс','все экскурс','экскурсии ','что посмотреть','чем заняться','морские прогул','снорклинг'],w:['экскурс','сколько','стоит','стоят','цен','цены'],a:'Морские экскурсии с Маафуши:\n• Акулы, песчаная коса, дельфины и скаты — $65\n• Снорклинг с китовой акулой и мантами — $110\n• Half Day: черепахи, рифовая акула, немо (атолл Каафу) — $35\n• «Аквариум»: скаты, риф, песчаная отмель — $80\n• Мале — столица Мальдив — от $20\nЦены с человека, включая все таксы и сборы.',go:'exc',gl:'Все экскурсии'},
+ {id:'sharks',k:['акул','нянь','дельфин','скат','песчаная кос','косу','коса'],a:'Экскурсия «Акулы, песчаная коса, дельфины и скаты» — $65 с человека (все таксы и сборы включены):\n• дети 3–10 лет — $40, до 3 лет — бесплатно\n• приватный тур — $2000 (до 18 человек)\n\nСбор в 7:45, выход от причала Маафуши в 8:00: дельфины → скаты → снорклинг с акулами-няньками → песчаная коса. Возвращение в 14:30.\nВключены снаряжение, ланч, вода, полотенца. Съёмка с дрона — $20 с человека за локацию.',go:'exc',gl:'Экскурсии'},
+ {id:'whale',k:['китов','кит ','манта','мант','manta'],a:'Снорклинг с китовой акулой — $110 с человека (все таксы и сборы включены):\n• дети 3–10 лет — $70\n• приватный тур — $2500 (до 18 человек)\nПроводится при полной группе — от 10 человек.\n\nСбор в 7:00, выход в 7:30: китовая акула → лагуна с мантами → остров «Пикник» (ланч, вода, полотенца, свободное время). Возвращение в 15:00.',go:'exc',gl:'Экскурсии'},
+ {id:'half',k:['half','полдня','пол дня','каафу','черепах','немо','лобстер','биягу','бияду','куда гири','гули'],a:'Half Day (атолл Каафу) — $35 с человека (все таксы и сборы включены):\n• дети 3–10 лет — $25\n• приватный тур — $1000 (до 18 человек)\n\nСбор в 9:45, выход в 10:00: риф Бияду (черепахи, рифовая акула, мурена, немо) → риф «Куда Гири» (лобстер, осьминог, кораллы) → локальный остров Гули: ланч, вода, полотенца, свободное время. Возвращение в 14:30.',go:'exc',gl:'Экскурсии'},
+ {id:'aqua',k:['аквариум','отмел','sand bank','риф'],a:'Экскурсия «Аквариум» — $80 с человека (все таксы и сборы включены):\n• дети до 10 лет — $60, до 3 лет — бесплатно\n• приватный тур — $1800 (до 18 человек)\n\nСбор в 9:00, выход в 9:15: «Аквариум» со скатами → снорклинг на рифе → песчаная отмель: ланч, вода, полотенца, зонты. Возвращение в 15:00.',go:'exc',gl:'Экскурсии'},
+ {id:'male',k:['мале','столиц','рынок','рынк','мечет','сувенир','город'],a:'Экскурсия по Мале — столице Мальдив, с гидом. Цена с человека (все таксы и сборы включены):\n• 2–4 человека — $40\n• 5–8 человек — $30\n• 9–16 человек — $25\n• от 20 человек — $20\n\nРыбный и фруктовый рынки, центральная площадь и мечеть, достопримечательности, сувениры. Включены паром из аэропорта и обратно, гид, хранение багажа. Не включены: еда, напитки и входные билеты (по желанию).',go:'exc',gl:'Экскурсии'},
+ {id:'kids',k:['ребен','дет','детск','малыш','сын','доч','с детьми'],a:'Детские цены на экскурсии:\n• Акулы и коса — 3–10 лет $40, до 3 лет бесплатно\n• Китовая акула — 3–10 лет $70\n• Half Day — 3–10 лет $25\n• Аквариум — до 10 лет $60, до 3 лет бесплатно\n\nРезорты: Sun Siyam — 2–12 лет $85, Adaaran — 2–12 лет $90 (до 2 лет бесплатно). На Centara Ras Fushi с детьми до 12 лет нельзя.'},
+ {id:'priv',k:['приват','индивидуальн','свою компани','только для нас','отдельный катер','персональн'],a:'Приватные экскурсии — катер только для вашей компании (до 18 человек):\n• Акулы и коса — $2000\n• Китовая акула — $2500\n• Аквариум — $1800\n• Half Day — $1000\nМожно собрать и индивидуальный маршрут — напишите даты и пожелания.',go:'form',gl:'Оставить заявку'},
+ {id:'drone',k:['дрон','с дрона','съемка с дрон','съемку с дрон','квадрокоптер','с воздуха','mavic'],a:'Съёмка с дрона (DJI Mavic Pro 3) на экскурсии «Акулы и коса» — $20 с человека за каждую локацию (на акулах и на песчаной косе), оплачивается отдельно.\nНа фотосессиях: с дрона — +$100, только дрон — $150.'},
+ {id:'photos',k:['фото с экскурс','видео с экскурс','забрать фото','получить фото','когда фото','фото и видео','где фото','фото отдаете'],a:'Фото и видео с экскурсии можно забрать в нашем агентстве в этот же день — с 19:00 до 22:00.'},
+ {id:'equip',k:['снаряж','маск','ласт','трубк','жилет','что взять','что с собой','полотенц','обед','ланч','еда','кормят','кормят на экскурс','что дают на экскурс','что включено в экскурс','что входит в экскурс'],a:'На экскурсиях выдаём снаряжение: маски, ласты, трубки и жилеты. Также включены ланч, вода и пляжные полотенца (на «Аквариуме» — ещё и зонты от солнца).\nНа экскурсию по Мале еда и напитки не включены.'},
+ {id:'swim',k:['не умею плават','плохо плава','не плаваю','боюсь','страшно','безопасн'],a:'На экскурсиях выдаём жилеты, маски и ласты, рядом всегда наши ребята — плавать с акулами-няньками и скатами спокойно и безопасно, многие гости решаются впервые. Если есть сомнения — напишите, подберём формат.',go:'mgr',gl:'Написать менеджеру'},
+ {id:'res',k:['резорт','resort','курорт','день на резорт','однодневн','всё включено','все включено','sun siyam','olhuveli','adaaran','ranhali','fihalhohi','фихалхохи','centara','сентар','центар','ras fushi','centara с детьми','сентара с детьми','резорт с детьми','без детей'],a:'Однодневные выезды на 5* резорты с Маафуши (обычно 9:00–17:00, трансфер на катере, обед шведский стол, напитки, пляж):\n• Olhuveli Sun Siyam — $145, дети 2–12 лет $85\n• Adaaran Club Ranhali — $130, дети 2–12 лет $90, до 2 лет бесплатно\n• Fihalhohi Island — риф со скатами и акулами, безлимитные напитки\n• Centara Ras Fushi — $160, только от 12 лет, 8:00–18:30\nЗабронировать и оплатить нужно до 21:00 предыдущего дня.',go:'res',gl:'Резорты'},
+ {id:'hotels',k:['отел','гостиниц','где жить','где остановит','проживан','номер','заселен','kaani','каани','arena','icom','palms','тодду','thoddoo','гестхаус'],a:'Отели на локальных островах по прямым контрактам, без посредников:\n• Маафуши — Kaani Palm, Kaani Grand, Arena Beach, Icom Blue\n• Тодду — The Palms (тихий остров, пляжи и плантации)\n\nПредоплата — 20% от стоимости (2000 ₽ из неё невозвратные), в рублях по курсу; остальное — в долларах при заселении. Свободные даты и цены на сезон — на странице отеля.',go:'hot',gl:'Отели'},
+ {id:'lux',k:['luxury','люкс','вилл','водн вилл','private island','частный остров','остров-резорт','жить на резорт','проживание на резорт','премиум','vip'],a:'Бронирование отдыха на резортах премиум-класса и частных островах — консьерж-сервис совместно с BE IN MALDIVES. Запрос обрабатывается индивидуально: подберём остров и виллу, есть варианты, которых нет на Booking.',go:'mgr',gl:'Написать менеджеру'},
+ {id:'tour',k:['авторск','тур','маршрут','групп','5 остров','7 остров','путешеств'],w:['сколько','стоит','цен'],a:'Авторский тур на Маафуши — от $1960:\n• 5–7 островов и подводный мир\n• фото- и видеосъёмка\n• группы 8–12 человек\n• комфортное размещение, морские прогулки, лучшие локации\n\nДаты 2026–2027: 01.11–08.11, 30.12–06.01 (Новый год), 24.01–31.01, 13.02–20.02, 06.03–13.03, 20.03–27.03, 03.04–10.04, 28.04–05.05.',go:'tour',gl:'Забронировать тур'},
+ {id:'ny',k:['новый год','новогод','нг ','праздник','рождеств'],a:'Новый год на Мальдивах — авторский тур с 30.12 по 06.01.27. На Новый год рекомендуем бронировать заранее: места в группе ограничены (8–12 человек).',go:'tour',gl:'Забронировать'},
+ {id:'dates',k:['дат','когда тур','ближайш','свободн','в каком месяц','расписан'],a:'Ближайшие даты авторского тура: 01.11–08.11, 30.12–06.01 (Новый год), 24.01–31.01, 13.02–20.02, 06.03–13.03, 20.03–27.03, 03.04–10.04, 28.04–05.05.\nЭкскурсии — почти каждый день, дату выбираете в заявке.',go:'tour',gl:'Выбрать даты'},
+ {id:'dive',k:['дайв','погружен','акваланг','scuba','open water','advanced','сертификат дайв','padi','shark tank'],a:'Дайвинг с инструктором — от $55:\n• Discover Scuba Diving — первое погружение для новичков, 2–3 часа\n• Shark Tank Dive — погружение к акулам, для дайверов с опытом\n• Single Dive — разовое погружение для сертифицированных дайверов (баллоны, грузы, гид, трансфер включены)\n• Open Water Diver — международный сертификат, до 18 м, 3–4 дня\n• Advanced Open Water — до 30 м, 2–3 дня\nФото и видео включены.',go:'dive',gl:'Дайвинг'},
+ {id:'active',k:['парасейл','гидроцикл','флайборд','серф','банан','каяк','sup','сап','вейк','водные лыж','водные развлеч','активн','jet'],a:'Водные развлечения на Маафуши: парасейлинг, гидроциклы и Jet Car, флайборд, вейкбординг и водные лыжи, банан и Fun Tube, каяки и SUP, серфинг, пакеты для двоих. Работаем с проверенными операторами. Стоимость зависит от сезона и погоды — уточните у менеджера.',go:'mgr',gl:'Узнать цены'},
+ {id:'photo',k:['фотосесс','фотограф','фотосъем','съемк','снимок','портфолио'],a:'Фотосессии на Мальдивах:\n• На резорте — от $250: 2 часа съёмки (входной билет и трансфер фотографа отдельно)\n• На необитаемом острове или косе — от $200: 1,5 часа (трансфер от $100)\n• Дрон — +$100, только дрон — $150\nВсе исходники отдаём в тот же день на ваш носитель (от 32 ГБ), 10 фото в ретуши и 30 в цветокоррекции — в течение 2 недель после отбора.',go:'mgr',gl:'Заказать съёмку'},
+ {id:'wed',k:['свадьб','церемон','жених','невест','помолвк','обручен','брак'],a:'Свадебная церемония на локальном или необитаемом острове — от $700:\n• фотограф 2 часа: все исходники, 10 фото в ретуши, 30 в цветокоррекции\n• оформление арки, церемония и сертификат\n• букет невесты (прокат, искусственные цветы)\nЦеремонию на английском проводит мальдивец в национальной одежде. Макияж и причёска — отдельно (из Мале, от $150), видео — от $150.',go:'mgr',gl:'Обсудить свадьбу'},
+ {id:'prepay',k:['предоплат','аванс','залог','бронирован','как забронир','забронир'],a:'Предоплата:\n• экскурсии — $10 с человека за каждую экскурсию (невозвратная, входит в стоимость)\n• отели — 20% от стоимости, из них 2000 ₽ невозвратные\nПредоплата вносится в рублях по курсу USD (Россельхозбанк, покупка). Экскурсию нужно полностью оплатить не позднее чем за 2 дня, иначе бронь может быть отменена.',go:'form',gl:'Оставить заявку'},
+ {id:'pay',k:['оплат','как плат','картой','карту','наличн','доллар','usd','рубл','перевод','комисс','visa','mastercard','union'],a:'Оплата остатка:\n• рублями переводом на карту (кроме резортов и рыбалки — там только наличные USD)\n• наличными USD в офисе\n• картой VISA / MasterCard / UnionPay в офисе, если карта работает за границей — комиссия Банка Мальдив 4%\nПредоплата — в рублях по курсу USD (Россельхозбанк, покупка).'},
+ {id:'cancel',k:['отмен','отказ','возврат','вернут','вернете','не смогу'],a:'Отмена экскурсии:\n• если отменяете вы за 24+ часа — возврат за вычетом предоплаты\n• менее чем за 24 часа — без возврата\n• если отменяет компания (например, из-за погоды) — 100% возврат в течение 1 рабочего дня'},
+ {id:'move',k:['перенес','перенос','другую дат','поменять дат','сдвинуть'],a:'Экскурсию можно перенести на другую дату один раз — не позднее чем за 5 дней до неё, при наличии группы и свободных мест.'},
+ {id:'visa',k:['виз','паспорт','разрешени','граница','въезд'],a:'Гражданам России виза на Мальдивы не нужна: бесплатное разрешение на пребывание до 30 дней ставят в паспорт по прилёте.'},
+ {id:'contact',k:['связ','контакт','whatsapp','ватсап','вотсап','телеграм','telegram','позвон','написать','менеджер','катя','катерин','екатерин','ответ'],a:'Мы на связи 24/7 в WhatsApp и Telegram, среднее время ответа — около 15 минут. Или оставьте заявку прямо в приложении.',go:'mgr',gl:'Написать в Telegram'},
+ {id:'about',k:['кто вы','о вас','о компани','агентств','alga','алга','основател','давно','опыт','надежн'],a:'ALGA — туристическое агентство на Мальдивах. Основатель — Екатерина: больше 10 лет живёт на Мальдивах, создаёт авторские туры, организует экскурсии и лично сопровождает гостей. Работаем с отелями по прямым контрактам, без посредников, поддержка 24/7.'},
+ {id:'why',k:['почему вы','почему с вами','выгодн','дешевл','лучшая цен','скидк','booking','букинг'],a:'Почему с ALGA выгоднее: прямые контракты с отелями без посредников, гарантия лучшей цены и доступ к виллам, которых нет на Booking. На связи 24/7.'},
+ {id:'island',k:['маафуши','maafushi','локальный остров','где вы','где находит','офис'],a:'Мы базируемся на острове Маафуши — экскурсии и выезды на резорты стартуют от причала Маафуши, там же наш офис (фото с экскурсий, оплата наличными или картой).'},
+ {id:'presets',k:['пресет','lut','лут','lightroom','лайтрум','обработк фото'],a:'Пресеты Maldives от Антона Аванзато: 5 пресетов для фото и 5 LUT для видео — для Lightroom Mobile/Classic, DaVinci, Premiere, VN. Можно использовать и в коммерческих проектах.',go:'pre',gl:'Пресеты'},
+ {id:'book',k:['записат','заявк','заказать','хочу на','хочу экскурс','хочу тур','как заказ'],a:'Оставьте заявку прямо здесь: выберите экскурсию, резорт, отель или тур и дату — менеджер свяжется с вами в WhatsApp или Telegram.',go:'form',gl:'Оставить заявку'}
+];
+var AQUICK=['Экскурсии и цены','Китовая акула','Резорты на день','Авторский тур','Дайвинг','Как оплатить','Отмена','Нужна виза?'];
+
+/* поиск: корень ищется с начала слова; k — тема (вес = длина), w — общие слова (вес 1), req — обязательные слова */
+function aqNorm(t){return (' '+String(t).toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я0-9₽$ .]/g,' ').replace(/\s+/g,' ')+' ')}
+function aqFind(q){var t=aqNorm(q),best=null,bs=0;AFAQ.forEach(function(f){var sc=0;f.k.forEach(function(k){if(t.indexOf(' '+k)>=0)sc+=k.length});if(sc&&f.w)f.w.forEach(function(k){if(t.indexOf(' '+k)>=0)sc+=1});if(!sc&&f.w){var n=0;f.w.forEach(function(k){if(t.indexOf(' '+k)>=0)n++});if(n>=2)sc=3}if(f.req){var rq=0;f.req.forEach(function(k){if(t.indexOf(' '+k)>=0)rq=1});sc=rq&&sc?sc+10:0}if(sc>bs){bs=sc;best=f}});return bs>=3?best:null}
+/* кнопка на главной — только для русского интерфейса (ответы пока на русском) */
+function askBtn(){try{if(typeof L!=='undefined'&&L!=='ru')return''}catch(e){}return '<button type="button" class="aqb" onclick="askOpen()"><i><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg></i><span><b>Задать вопрос</b><small>Экскурсии, цены, оплата — ответ сразу</small></span><em>→</em></button>'}
+var AQ=null,aqLast='';
+function aqTg(){return window.Telegram&&Telegram.WebApp}
+function aqBuild(){if(AQ)return AQ;var w=document.createElement('div');w.className='aqw';w.hidden=true;
+ w.innerHTML='<div class="aqbg"></div><section class="aqs" role="dialog" aria-label="Вопрос ALGA"><i class="aqg"></i><div class="aqh"><span><b>Вопрос ALGA</b><small>Готовые ответы · если не найду — передам менеджеру</small></span><button type="button" aria-label="Закрыть"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="aql"></div><div class="aqq"></div><form class="aqf"><input maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="Например: сколько стоит китовая акула?"><button type="submit" aria-label="Отправить" disabled><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></button></form></section>';
+ document.body.appendChild(w);
+ AQ={w:w,sh:w.querySelector('.aqs'),L:w.querySelector('.aql'),Q:w.querySelector('.aqq'),F:w.querySelector('.aqf'),I:w.querySelector('.aqf input'),S:w.querySelector('.aqf button'),H:w.querySelector('.aqh'),G:w.querySelector('.aqg')};
+ w.querySelector('.aqbg').onclick=askClose;w.querySelector('.aqh button').onclick=askClose;
+ AQUICK.forEach(function(q){var b=document.createElement('button');b.type='button';b.textContent=q;b.onclick=function(){aqAnswer(q)};AQ.Q.appendChild(b)});
+ AQ.I.oninput=function(){AQ.S.disabled=!this.value.trim()};
+ AQ.F.onsubmit=function(e){e.preventDefault();aqAnswer(AQ.I.value);AQ.I.value='';AQ.S.disabled=true};
+ /* свайп вниз за шапку — закрыть (кнопки не трогаем, чтобы нажатие не терялось) */
+ var y0=null,dy=0,t0=0,sh=AQ.sh;
+ function st(e){if(e.target.closest('button'))return;y0=e.touches[0].clientY;dy=0;t0=Date.now();sh.classList.remove('back');sh.classList.add('drag')}
+ function mv(e){if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform='translateY('+dy+'px)';if(dy>0)e.preventDefault()}
+ function en(){if(y0===null)return;y0=null;sh.classList.remove('drag');sh.classList.add('back');if(dy>120||(dy>60&&Date.now()-t0<300)){sh.style.transform='translateY(100%)';setTimeout(function(){askClose();sh.classList.remove('back');sh.style.transform=''},230)}else sh.style.transform=''}
+ [AQ.H,AQ.G].forEach(function(el){el.addEventListener('touchstart',st,{passive:true});el.addEventListener('touchmove',mv,{passive:false});el.addEventListener('touchend',en);el.addEventListener('touchcancel',en)});
+ return AQ}
+function aqMsg(cls,text,go,gl,fn){var d=document.createElement('div');d.className='aqm '+cls;d.textContent=text;
+ if(go||fn){var b=document.createElement('button');b.type='button';b.className='ga';b.textContent=(gl||'Открыть')+' →';b.onclick=fn||function(){aqGo(go)};d.appendChild(document.createElement('br'));d.appendChild(b)}
+ AQ.L.appendChild(d);AQ.L.scrollTop=AQ.L.scrollHeight;return d}
+function aqMgr(){var u='https://t.me/katerinamaldives',tg=aqTg();try{tg.openTelegramLink(u)}catch(e){window.open(u,'_blank')}}
+function aqGo(g){askClose();try{
+ if(g==='exc')list('excursions');else if(g==='hot')list('hotels');else if(g==='res')list('resorts');
+ else if(g==='dive')diving();else if(g==='pre')presets();else if(g==='tour')openForm('author');
+ else if(g==='form')openForm('excursion');else if(g==='mgr')aqMgr()}catch(e){}}
+function aqToMgr(){var q=aqLast;try{navigator.clipboard&&navigator.clipboard.writeText(q)}catch(e){}aqMgr()}
+function aqAnswer(q){q=String(q||'').trim();if(!q)return;aqLast=q;aqMsg('u',q);try{aqTg().HapticFeedback.selectionChanged()}catch(e){}
+ var ty=aqMsg('a t','• • •');setTimeout(function(){ty.remove();var f=aqFind(q);
+  if(f)aqMsg('a',f.a,f.go,f.gl);else aqMsg('a','Не нашёл готового ответа на этот вопрос. Напишите менеджеру ALGA — ответим в течение ~15 минут, на связи 24/7.',null,'Написать менеджеру',aqToMgr)},450)}
+function askOpen(){aqBuild();AQ.w.hidden=false;if(!AQ.L.children.length)aqMsg('a','Здравствуйте! Отвечу на частые вопросы: экскурсии и цены, резорты, отели, авторский тур, дайвинг, оплата и отмена. Спросите своими словами или выберите ниже 👇');
+ var tg=aqTg();try{tg.BackButton.show();tg.BackButton.onClick(askClose)}catch(e){}try{tg.disableVerticalSwipes()}catch(e){}}
+function askClose(){if(!AQ||AQ.w.hidden)return;AQ.w.hidden=true;try{AQ.I.blur()}catch(e){}var tg=aqTg();try{tg.BackButton.offClick(askClose)}catch(e){}
+ var home=document.getElementById('home');if(home&&home.classList.contains('on')){try{tg.BackButton.hide()}catch(e){}try{tg.enableVerticalSwipes()}catch(e){}}}
+</script>
+</head><body>
 
 <section class="v on" id="home"></section>
 <section class="v" id="list"></section>
@@ -219,6 +338,7 @@ function home(){
    <div class="tile ph" onclick="diving()">${tph(tU('dv',d&&d.excursions[3]&&d.excursions[3].img))}<i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1.5l-1.5-2-1.5 2H6a3 3 0 0 1-3-3z"/><path d="M21 4v9a5 5 0 0 1-5 5h-2"/></svg></i><b>${T.div}</b><small>${T.divS}</small></div>
    <div class="tile w pre" onclick="presets()"><span class="pba" aria-hidden="true"><img src="${PRE.list[3][0]}" alt=""><img class="aft" src="${PRE.list[3][1]}" alt=""><span class="pln"></span><em class="pl a">${L==='ru'?'До':'Before'}</em><em class="pl b">${L==='ru'?'После':'After'}</em></span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></i><b>${PT.tile}</b><small>${PT.tileS}</small></div>
   </div>
+  ${askBtn()}
   ${dates.length?`<div class="sec">${T.near}</div><div class="dg">${dates.map((x,i)=>dCard(x,i,dates.length,`openForm('author',null,'${x.start}','${x.end}')`,'')).join('')}</div>`:''}
   ${top.length?`<div class="sec">${T.exc}</div>${top.map((c,i)=>card(c,'excursions',i)).join('')}`:''}
   ${contacts()}
