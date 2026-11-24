@@ -536,7 +536,8 @@ function aqSmart(q){var t=aqNorm(q);
 function aqLbl(id){var m=aqEn()?AQL_EN:AQL;return m[id]||''}
 function aqRel(q,ex){var out=[],seen={};function add(id){var l=aqLbl(id);if(l&&id!==ex&&!seen[id]&&out.length<4){seen[id]=1;out.push(l)}}
  aqRank(q,8).forEach(function(x){add(x.f.id)});
- if(ex){var pre=(ex.match(/^(w_|pg_|pre|k_|r_)/)||[])[0];if(pre)aqArr().forEach(function(f){if(f.id.indexOf(pre)===0)add(f.id)})}
+ if(ex){var pre=(ex.match(/^(w_|pg_|pre|k_|r_|pk_|vid_|ln_|x_|an_|t_|dv_)/)||[])[0];if(pre)aqArr().forEach(function(f){if(f.id.indexOf(pre)===0)add(f.id)})}
+ if(out.length<2)['exc','x_pick','res','tour','weather','pay','book'].forEach(function(id){add(id)});
  return out}
 function aqChips(ls){if(!ls.length)return;var d=document.createElement('div');d.className='aqm a aqc';ls.forEach(function(l){var b=document.createElement('button');b.type='button';b.textContent=l;b.onclick=function(){aqAnswer(l)};d.appendChild(b)});AQ.L.appendChild(d);AQ.L.scrollTop=AQ.L.scrollHeight}
 function aqAnswer(q){q=String(q||'').trim();if(!q)return;aqLast=q;aqMsg('u',q);try{aqTg().HapticFeedback.selectionChanged()}catch(e){}
