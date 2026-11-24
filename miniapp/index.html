@@ -171,7 +171,17 @@ details.dvp{background:var(--card);border:1px solid var(--ln);border-radius:16px
 .aqf input{flex:1;min-width:0;height:46px;padding:0 14px;border:1px solid var(--ln);border-radius:14px;background:var(--card);color:var(--tx);font:16px Manrope,system-ui,sans-serif}
 .aqf button{flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:46px;padding:0;border:0;border-radius:50%;background:var(--aq);color:#04202a;line-height:0;cursor:pointer;transition:opacity .2s,transform .15s}
 .aqf button:disabled{opacity:.3}.aqf button:active{transform:scale(.92)}
-@media (prefers-reduced-motion:reduce){.aqb i,.aqb em,.aqb::after{animation:none}}
+.aqfab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom) + var(--tg-safe-area-inset-bottom,0px));z-index:80;display:flex;align-items:center;gap:8px;height:52px;padding:0 18px 0 14px;border:0;border-radius:99px;background:linear-gradient(135deg,var(--ac),var(--aq));color:#fff;font:600 15px Manrope,system-ui,sans-serif;box-shadow:0 10px 28px rgba(14,95,118,.45);cursor:pointer;overflow:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s;-webkit-tap-highlight-color:transparent}
+.aqfab svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;animation:aqbob 3.2s ease-in-out infinite}
+.aqfab::before{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 0 rgba(43,189,238,.55);animation:aqpulse 2.8s ease-out infinite;pointer-events:none}
+.aqfab::after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-18deg);animation:aqgl 4.5s ease-in-out infinite;pointer-events:none}
+.aqfab:active{transform:scale(.94)}
+.aqfab.off{transform:translateY(140%);opacity:0;pointer-events:none}
+@keyframes aqpulse{0%{box-shadow:0 0 0 0 rgba(43,189,238,.5)}70%,100%{box-shadow:0 0 0 14px rgba(43,189,238,0)}}
+.aqbg{transition:opacity .25s}
+.aqw.closing .aqbg{opacity:0}
+.aqw.closing .aqs{transform:translateY(100%)!important;transition:transform .26s cubic-bezier(.4,0,.6,1)}
+@media (prefers-reduced-motion:reduce){.aqb i,.aqb em,.aqb::after,.aqfab svg,.aqfab::before,.aqfab::after{animation:none}}
 </style>
 <script>
 /* ═══ «Задать вопрос» — готовые ответы по ключевым словам (тексты с alga-tour.com).
@@ -234,8 +244,8 @@ function aqBuild(){if(AQ)return AQ;var w=document.createElement('div');w.classNa
  /* свайп вниз за шапку — закрыть (кнопки не трогаем, чтобы нажатие не терялось) */
  var y0=null,dy=0,t0=0,sh=AQ.sh;
  function st(e){if(e.target.closest('button'))return;y0=e.touches[0].clientY;dy=0;t0=Date.now();sh.classList.remove('back');sh.classList.add('drag')}
- function mv(e){if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform='translateY('+dy+'px)';if(dy>0)e.preventDefault()}
- function en(){if(y0===null)return;y0=null;sh.classList.remove('drag');sh.classList.add('back');if(dy>120||(dy>60&&Date.now()-t0<300)){sh.style.transform='translateY(100%)';setTimeout(function(){askClose();sh.classList.remove('back');sh.style.transform=''},230)}else sh.style.transform=''}
+ var bg=w.querySelector('.aqbg');function mv(e){if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform='translateY('+dy+'px)';bg.style.opacity=String(Math.max(.2,1-dy/400));if(dy>0)e.preventDefault()}
+ function en(){if(y0===null)return;y0=null;sh.classList.remove('drag');if(dy>120||(dy>60&&Date.now()-t0<300)){askClose()}else{sh.classList.add('back');sh.style.transform='';bg.style.opacity='';setTimeout(function(){sh.classList.remove('back')},260)}}
  [AQ.H,AQ.G].forEach(function(el){el.addEventListener('touchstart',st,{passive:true});el.addEventListener('touchmove',mv,{passive:false});el.addEventListener('touchend',en);el.addEventListener('touchcancel',en)});
  return AQ}
 function aqMsg(cls,text,go,gl,fn){var d=document.createElement('div');d.className='aqm '+cls;d.textContent=text;
@@ -250,10 +260,16 @@ function aqToMgr(){var q=aqLast;try{navigator.clipboard&&navigator.clipboard.wri
 function aqAnswer(q){q=String(q||'').trim();if(!q)return;aqLast=q;aqMsg('u',q);try{aqTg().HapticFeedback.selectionChanged()}catch(e){}
  var ty=aqMsg('a t','• • •');setTimeout(function(){ty.remove();var f=aqFind(q);
   if(f)aqMsg('a',f.a,f.go,f.gl);else aqMsg('a','Не нашёл готового ответа на этот вопрос. Напишите менеджеру ALGA — ответим в течение ~15 минут, на связи 24/7.',null,'Написать менеджеру',aqToMgr)},450)}
-function askOpen(){aqBuild();AQ.w.hidden=false;if(!AQ.L.children.length)aqMsg('a','Здравствуйте! Отвечу на частые вопросы: экскурсии и цены, резорты, отели, авторский тур, дайвинг, оплата и отмена. Спросите своими словами или выберите ниже 👇');
+var aqBusy=false;function askOpen(){aqBuild();if(aqBusy)return;AQ.w.classList.remove('closing');AQ.sh.style.transform='';AQ.sh.classList.remove('back','drag');AQ.w.querySelector('.aqbg').style.opacity='';AQ.w.hidden=false;aqFabSync();if(!AQ.L.children.length)aqMsg('a','Здравствуйте! Отвечу на частые вопросы: экскурсии и цены, резорты, отели, авторский тур, дайвинг, оплата и отмена. Спросите своими словами или выберите ниже 👇');
  var tg=aqTg();try{tg.BackButton.show();tg.BackButton.onClick(askClose)}catch(e){}try{tg.disableVerticalSwipes()}catch(e){}}
-function askClose(){if(!AQ||AQ.w.hidden)return;AQ.w.hidden=true;try{AQ.I.blur()}catch(e){}var tg=aqTg();try{tg.BackButton.offClick(askClose)}catch(e){}
+function askClose(){if(!AQ||AQ.w.hidden||aqBusy)return;aqBusy=true;try{AQ.I.blur()}catch(e){}AQ.w.classList.add('closing');setTimeout(function(){AQ.w.hidden=true;AQ.w.classList.remove('closing');AQ.sh.style.transform='';AQ.sh.classList.remove('back','drag');AQ.w.querySelector('.aqbg').style.opacity='';aqBusy=false;aqFabSync()},270);var tg=aqTg();try{tg.BackButton.offClick(askClose)}catch(e){}
  var home=document.getElementById('home');if(home&&home.classList.contains('on')){try{tg.BackButton.hide()}catch(e){}try{tg.enableVerticalSwipes()}catch(e){}}}
+/* плавающая кнопка «Вопрос» */
+function aqFabSync(){var f=document.getElementById('aqfab');if(!f)return;var on=document.querySelector('.v.on'),id=on?on.id:'home';
+ var ok=(typeof L==='undefined'||L==='ru')&&/^(home|list|pres)$/.test(id)&&!(AQ&&!AQ.w.hidden);f.classList.toggle('off',!ok)}
+document.addEventListener('DOMContentLoaded',function(){var f=document.createElement('button');f.type='button';f.id='aqfab';f.className='aqfab off';f.setAttribute('aria-label','Задать вопрос');
+ f.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span>Вопрос</span>';f.onclick=function(){try{aqTg().HapticFeedback.impactOccurred('light')}catch(e){}askOpen()};document.body.appendChild(f);
+ new MutationObserver(aqFabSync).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});setTimeout(aqFabSync,400)});
 </script>
 </head><body>
 
@@ -338,7 +354,6 @@ function home(){
    <div class="tile ph" onclick="diving()">${tph(tU('dv',d&&d.excursions[3]&&d.excursions[3].img))}<i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1.5l-1.5-2-1.5 2H6a3 3 0 0 1-3-3z"/><path d="M21 4v9a5 5 0 0 1-5 5h-2"/></svg></i><b>${T.div}</b><small>${T.divS}</small></div>
    <div class="tile w pre" onclick="presets()"><span class="pba" aria-hidden="true"><img src="${PRE.list[3][0]}" alt=""><img class="aft" src="${PRE.list[3][1]}" alt=""><span class="pln"></span><em class="pl a">${L==='ru'?'До':'Before'}</em><em class="pl b">${L==='ru'?'После':'After'}</em></span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></i><b>${PT.tile}</b><small>${PT.tileS}</small></div>
   </div>
-  ${askBtn()}
   ${dates.length?`<div class="sec">${T.near}</div><div class="dg">${dates.map((x,i)=>dCard(x,i,dates.length,`openForm('author',null,'${x.start}','${x.end}')`,'')).join('')}</div>`:''}
   ${top.length?`<div class="sec">${T.exc}</div>${top.map((c,i)=>card(c,'excursions',i)).join('')}`:''}
   ${contacts()}
