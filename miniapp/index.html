@@ -315,6 +315,9 @@ function phoneInput(el,ev){if(L==='ru'){if(ev&&ev.inputType&&ev.inputType.starts
 function phoneOk(v){return L==='ru'?ruDigits(v).length===10:/^\+\d{7,15}$/.test(v.replace(/[\s()-]/g,''))}
 function phoneFmt(v){return L==='ru'?ruMask(ruDigits(v)):'+'+v.replace(/\D/g,'')}
 const DATEF={excursion:'excursion_date',hotel:'check_in_date',resort:'resort_date',author:'author_date_start',diving:'diving_date'};
+/* ответ клиенту от бота после заявки: разрешение писать (один раз) + запрос в скрипт бота с подписью Telegram */
+const THANKS='https://script.google.com/macros/s/AKfycbzkJYlcK_Ha1DBa8jGYEWHyRL_6MktRm6qytWjEXiA0BDckH4ahVRSikz_nTm1JUMMQ/exec?a=thanks';
+function thanks(k){try{if(!(tg&&tg.initData))return;const go=()=>fetch(THANKS,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({initData:tg.initData,kind:k||'',lang:L})}).catch(()=>{});if(tg.requestWriteAccess&&tg.isVersionAtLeast&&tg.isVersionAtLeast('6.9'))tg.requestWriteAccess((ok)=>{if(ok)go()});else go()}catch(e){}}
 async function send(ev){ev.preventDefault();const f=$('f'),err=$('err'),b=$('sb');err.textContent='';
   const fd=new FormData(f);
   if(!fd.get(DATEF[KIND])){err.textContent=T.eDate;return false}
@@ -327,7 +330,7 @@ async function send(ev){ev.preventDefault();const f=$('f'),err=$('err'),b=$('sb'
   if(u&&u.username)fd.set('important_notes',(String(fd.get('important_notes')||'')+`\nTelegram: @${u.username}`).trim());
   b.disabled=true;b.textContent=T.sending;
   try{const ac=new AbortController(),to=setTimeout(()=>ac.abort(),20000);const r=await fetch(ENDPOINT,{method:'POST',body:new URLSearchParams(fd),signal:ac.signal}).finally(()=>clearTimeout(to));if(!r.ok)throw 0;
-    formClear(KIND);$('done').innerHTML=`<div class="hero"><h1><span class="okic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${T.ok}</h1><p>${T.okS}</p></div><button class="btn f" onclick="show('home')">${T.close}</button>${contacts()}`;show('done');
+    formClear(KIND);thanks(KIND);$('done').innerHTML=`<div class="hero"><h1><span class="okic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${T.ok}</h1><p>${T.okS}</p></div><button class="btn f" onclick="show('home')">${T.close}</button>${contacts()}`;show('done');
     try{tg.HapticFeedback.notificationOccurred('success')}catch(e){}}
   catch(e){err.textContent=T.fail}finally{b.disabled=!$('agree').checked;b.textContent=T.send}return false}
 
