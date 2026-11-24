@@ -181,6 +181,7 @@ details.dvp{background:var(--card);border:1px solid var(--ln);border-radius:16px
 .aqbg{transition:opacity .25s}
 .aqw.closing .aqbg{opacity:0}
 .aqw.closing .aqs{transform:translateY(100%)!important;transition:transform .26s cubic-bezier(.4,0,.6,1)}
+.aqw{position:fixed;inset:0;overscroll-behavior:none}.aqw[hidden]{display:none}.aqbg{animation:none!important;opacity:0;transition:opacity .32s ease;touch-action:none}.aqs{animation:none!important;transform:translateY(100%);transition:transform .4s cubic-bezier(.32,.72,0,1);will-change:transform;height:86vh;height:86dvh;max-height:86dvh}.aqw.on .aqbg{opacity:1}.aqw.on .aqs{transform:translateY(0)}.aqw.drag .aqbg,.aqs.drag{transition:none!important}.aql{overscroll-behavior:contain}
 @media (prefers-reduced-motion:reduce){.aqb i,.aqb em,.aqb::after,.aqfab svg,.aqfab::before,.aqfab::after{animation:none}}
 </style>
 <script>
@@ -291,7 +292,24 @@ var AQUICK_EN=['Excursions & prices','Whale shark','Resort day visit','Signature
 function aqEn(){try{return typeof L!=='undefined'&&L==='en'}catch(e){return false}}
 function aqTx(ru,en){return aqEn()?en:ru}
 /* блокировка прокрутки страницы под шторкой (iOS: position:fixed с сохранением позиции) */
-var aqY=0;function aqLock(on){var b=document.body;if(on){aqY=window.scrollY||0;b.style.position='fixed';b.style.top=(-aqY)+'px';b.style.left='0';b.style.right='0';b.style.overflow='hidden'}else{b.style.position='';b.style.top='';b.style.left='';b.style.right='';b.style.overflow='';window.scrollTo(0,aqY)}}
+/* единый контроллер шторки: open/close/свайп, без двойных срабатываний */
+function mkSheet(o){var st='closed',tmr=0,at=0,sh=o.sh,w=o.w,bg=o.bg;
+ function after(fn){clearTimeout(tmr);var ok=false;function f(e){if(e&&e.target!==sh)return;if(ok)return;ok=true;sh.removeEventListener('transitionend',f);clearTimeout(tmr);fn()}sh.addEventListener('transitionend',f);tmr=setTimeout(f,480)}
+ function clr(){sh.classList.remove('drag');w.classList.remove('drag');sh.style.transform='';bg.style.opacity=''}
+ function open(){if(st==='open'||st==='opening')return;var was=st;st='opening';at=Date.now();w.hidden=false;o.lock(true);if(was==='closed'){clr();void sh.offsetHeight}else clr();w.classList.add('on');try{o.onOpen&&o.onOpen()}catch(e){}after(function(){if(st==='opening')st='open'})}
+ function close(){if(st==='closed'||st==='closing')return;st='closing';try{var a=document.activeElement;if(a&&w.contains(a))a.blur()}catch(e){}clr();w.classList.remove('on');o.lock(false);try{o.onClose&&o.onClose()}catch(e){}after(function(){if(st!=='closing')return;st='closed';w.hidden=true;try{o.onClosed&&o.onClosed()}catch(e){}})}
+ bg.addEventListener('click',function(){if(Date.now()-at>380)close()});
+ bg.addEventListener('touchmove',function(e){e.preventDefault()},{passive:false});
+ var y0=null,x0=0,dy=0,t0=0,drag=false,fromList=false;
+ function st0(e){if(st!=='open'&&st!=='opening')return;if(e.touches.length>1)return;var t=e.target;if(t.closest('button,input,textarea,a'))return;fromList=!!(o.list&&o.list.contains(t));if(fromList&&o.list.scrollTop>0)return;y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;t0=Date.now();drag=false}
+ function mv(e){if(y0===null)return;var d=e.touches[0].clientY-y0,dx=Math.abs(e.touches[0].clientX-x0);
+  if(!drag){if(Math.abs(d)<6&&dx<6)return;if(d<=0||dx>Math.abs(d)||(fromList&&o.list.scrollTop>0)){y0=null;return}drag=true;sh.classList.add('drag');w.classList.add('drag')}
+  e.preventDefault();dy=Math.max(0,d);sh.style.transform='translateY('+dy+'px)';bg.style.opacity=String(Math.max(0,1-dy/(sh.offsetHeight||600)))}
+ function en(){if(y0===null)return;y0=null;if(!drag)return;drag=false;var v=dy/Math.max(1,Date.now()-t0),h=sh.offsetHeight||600;if(dy>h*.28||(v>.55&&dy>40))close();else clr()}
+ sh.addEventListener('touchstart',st0,{passive:true});sh.addEventListener('touchmove',mv,{passive:false});sh.addEventListener('touchend',en);sh.addEventListener('touchcancel',en);
+ return {open:open,close:close,isOpen:function(){return st==='open'||st==='opening'}}}
+function mkLock(){var y=0,on=false;return function(v){var B=document.body,H=document.documentElement;if(v&&!on){on=true;y=window.scrollY||0;B.style.position='fixed';B.style.top=-y+'px';B.style.left='0';B.style.right='0';B.style.width='100%';B.style.overflow='hidden';H.style.overflow='hidden'}else if(!v&&on){on=false;B.style.position='';B.style.top='';B.style.left='';B.style.right='';B.style.width='';B.style.overflow='';H.style.overflow='';window.scrollTo(0,y)}}}
+var aqLock=mkLock();
 var AQUICK=['Экскурсии и цены','Китовая акула','Резорты на день','Авторский тур','Дайвинг','Как оплатить','Отмена','Нужна виза?'];
 
 /* поиск: корень ищется с начала слова; k — тема (вес = длина), w — общие слова (вес 1), req — обязательные слова */
@@ -305,16 +323,14 @@ function aqBuild(){if(AQ)return AQ;var w=document.createElement('div');w.classNa
  w.innerHTML='<div class="aqbg"></div><section class="aqs" role="dialog" aria-label="'+aqTx('Вопрос ALGA','Ask ALGA')+'"><i class="aqg"></i><div class="aqh"><span><b>'+aqTx('Вопрос ALGA','Ask ALGA')+'</b><small>'+aqTx('Готовые ответы · если не найду — передам менеджеру','Instant answers · if I can’t help, a manager will')+'</small></span><button type="button" aria-label="'+aqTx('Закрыть','Close')+'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="aql"></div><div class="aqq"></div><form class="aqf"><input maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="'+aqTx('Например: сколько стоит китовая акула?','E.g. how much is the whale shark trip?')+'"><button type="submit" aria-label="Отправить" disabled><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></button></form></section>';
  document.body.appendChild(w);
  AQ={w:w,sh:w.querySelector('.aqs'),L:w.querySelector('.aql'),Q:w.querySelector('.aqq'),F:w.querySelector('.aqf'),I:w.querySelector('.aqf input'),S:w.querySelector('.aqf button'),H:w.querySelector('.aqh'),G:w.querySelector('.aqg')};
- w.querySelector('.aqbg').onclick=askClose;w.querySelector('.aqbg').addEventListener('touchmove',function(e){e.preventDefault()},{passive:false});w.querySelector('.aqh button').onclick=askClose;
+ w.querySelector('.aqh button').onclick=askClose;
  (aqEn()?AQUICK_EN:AQUICK).forEach(function(q){var b=document.createElement('button');b.type='button';b.textContent=q;b.onclick=function(){aqAnswer(q)};AQ.Q.appendChild(b)});
  AQ.I.oninput=function(){AQ.S.disabled=!this.value.trim()};
  AQ.F.onsubmit=function(e){e.preventDefault();aqAnswer(AQ.I.value);AQ.I.value='';AQ.S.disabled=true};
- /* свайп вниз за шапку — закрыть (кнопки не трогаем, чтобы нажатие не терялось) */
- var y0=null,dy=0,t0=0,sh=AQ.sh;
- function st(e){if(e.target.closest('button'))return;y0=e.touches[0].clientY;dy=0;t0=Date.now();sh.classList.remove('back');sh.classList.add('drag')}
- var bg=w.querySelector('.aqbg');function mv(e){if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform='translateY('+dy+'px)';bg.style.opacity=String(Math.max(.2,1-dy/400));if(dy>0)e.preventDefault()}
- function en(){if(y0===null)return;y0=null;sh.classList.remove('drag');if(dy>120||(dy>60&&Date.now()-t0<300)){askClose()}else{sh.classList.add('back');sh.style.transform='';bg.style.opacity='';setTimeout(function(){sh.classList.remove('back')},260)}}
- [AQ.H,AQ.G].forEach(function(el){el.addEventListener('touchstart',st,{passive:true});el.addEventListener('touchmove',mv,{passive:false});el.addEventListener('touchend',en);el.addEventListener('touchcancel',en)});
+ AQ.ctl=mkSheet({w:w,sh:AQ.sh,bg:w.querySelector('.aqbg'),list:AQ.L,lock:aqLock,
+  onOpen:function(){aqFabSync();if(!AQ.L.children.length)aqMsg('a',aqTx('Здравствуйте! Отвечу на частые вопросы: экскурсии и цены, резорты, отели, авторский тур, дайвинг, оплата и отмена. Спросите своими словами или выберите ниже 👇','Hello! I answer common questions: excursions and prices, resorts, hotels, the signature tour, diving, payment and cancellation. Ask in your own words or pick one below 👇'));var tg=aqTg();try{tg.BackButton.show()}catch(e){}try{tg.disableVerticalSwipes()}catch(e){}},
+  onClose:function(){var tg=aqTg(),home=document.getElementById('home');if(home&&home.classList.contains('on')){try{tg.BackButton.hide()}catch(e){}try{tg.enableVerticalSwipes()}catch(e){}}},
+  onClosed:function(){aqFabSync()}});
  return AQ}
 function aqMsg(cls,text,go,gl,fn){var d=document.createElement('div');d.className='aqm '+cls;d.textContent=text;
  if(go||fn){var b=document.createElement('button');b.type='button';b.className='ga';b.textContent=(gl||aqTx('Открыть','Open'))+' →';b.onclick=fn||function(){aqGo(go)};d.appendChild(document.createElement('br'));d.appendChild(b)}
@@ -328,10 +344,9 @@ function aqToMgr(){var q=aqLast;try{navigator.clipboard&&navigator.clipboard.wri
 function aqAnswer(q){q=String(q||'').trim();if(!q)return;aqLast=q;aqMsg('u',q);try{aqTg().HapticFeedback.selectionChanged()}catch(e){}
  var ty=aqMsg('a t','• • •');setTimeout(function(){ty.remove();var f=aqFind(q);
   if(f)aqMsg('a',f.a,f.go,f.gl);else aqMsg('a',aqTx('Не нашёл готового ответа на этот вопрос. Напишите менеджеру ALGA — ответим в течение ~15 минут, на связи 24/7.','I don’t have a ready answer to that. Message an ALGA manager — we reply in about 15 minutes, 24/7.'),null,aqTx('Написать менеджеру','Message a manager'),aqToMgr)},450)}
-var aqBusy=false;function askOpen(){aqBuild();if(aqBusy)return;AQ.w.classList.remove('closing');AQ.sh.style.transform='';AQ.sh.classList.remove('back','drag');AQ.w.querySelector('.aqbg').style.opacity='';AQ.w.hidden=false;aqFabSync();if(!AQ.L.children.length)aqMsg('a',aqTx('Здравствуйте! Отвечу на частые вопросы: экскурсии и цены, резорты, отели, авторский тур, дайвинг, оплата и отмена. Спросите своими словами или выберите ниже 👇','Hello! I answer common questions: excursions and prices, resorts, hotels, the signature tour, diving, payment and cancellation. Ask in your own words or pick one below 👇'));aqLock(true);
- var tg=aqTg();try{tg.BackButton.show();tg.BackButton.onClick(askClose)}catch(e){}try{tg.disableVerticalSwipes()}catch(e){}}
-function askClose(){if(!AQ||AQ.w.hidden||aqBusy)return;aqBusy=true;try{AQ.I.blur()}catch(e){}AQ.w.classList.add('closing');setTimeout(function(){AQ.w.hidden=true;aqLock(false);AQ.w.classList.remove('closing');AQ.sh.style.transform='';AQ.sh.classList.remove('back','drag');AQ.w.querySelector('.aqbg').style.opacity='';aqBusy=false;aqFabSync()},270);var tg=aqTg();try{tg.BackButton.offClick(askClose)}catch(e){}
- var home=document.getElementById('home');if(home&&home.classList.contains('on')){try{tg.BackButton.hide()}catch(e){}try{tg.enableVerticalSwipes()}catch(e){}}}
+function askOpen(){aqBuild().ctl.open()}
+function askClose(){if(AQ)AQ.ctl.close()}
+function aqIsOpen(){return !!(AQ&&AQ.ctl.isOpen())}
 /* плавающая кнопка «Вопрос» */
 function aqFabSync(){var f=document.getElementById('aqfab');if(!f)return;var on=document.querySelector('.v.on'),id=on?on.id:'home';
  var ok=/^(home|list|pres)$/.test(id)&&!(AQ&&!AQ.w.hidden);f.classList.toggle('off',!ok)}
@@ -386,7 +401,7 @@ function show(id){document.querySelectorAll('.v').forEach((v)=>{v.classList.togg
   try{id==='home'?tg.BackButton.hide():tg.BackButton.show()}catch(e){}
   /* свайп вниз сворачивает приложение — на внутренних экранах выключаем, чтобы не мешал жесту «назад» */
   try{id==='home'?tg.enableVerticalSwipes():tg.disableVerticalSwipes()}catch(e){}}
-try{tg.BackButton.onClick(()=>show('home'))}catch(e){}
+try{tg.BackButton.onClick(()=>{if(typeof aqIsOpen==='function'&&aqIsOpen()){askClose();return}show('home')})}catch(e){}
 /* Жест «назад»: свайп от левого края вправо — то же, что кнопка «Назад» Telegram */
 function edgeBack(can,cur,go){var sx=0,sy=0,act=false,lock=0,el=null,dx=0;
   function reset(anim){if(!el)return;var e=el;e.style.transition=anim?'transform .22s cubic-bezier(.2,.8,.2,1)':'';e.style.transform='';if(anim)setTimeout(function(){e.style.transition=''},240)}
