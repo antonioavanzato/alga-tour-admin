@@ -692,7 +692,7 @@ function aqClar(q,f){if(!f)return null;var r=aqRank(q,4);if(r.length<2)return nu
  var da=dm(a.f.id),db=dm(b.f.id);if(da===db||da==='o'||db==='o')return null;
  var t=aqNorm0(q);if(/ (резорт|отел|resort|hotel|погод|weather|дожд|rain|экскурс|trip|tour|снорк|snork|акул|shark|китов|whale)/.test(t))return null;
  if(!aqLbl(a.f.id)||!aqLbl(b.f.id))return null;return [a.f,b.f]}
-var AQ_LOG_URL='';
+var AQ_LOG_URL='https://functions.yandexcloud.net/d4eomo0n8sm2nbm1iv2v';
 function aqLog(q){try{var k='alga_miss',a=JSON.parse(localStorage.getItem(k)||'[]');a.push({q:String(q).slice(0,300),d:new Date().toISOString().slice(0,10),en:aqEn()?1:0});localStorage.setItem(k,JSON.stringify(a.slice(-100)))}catch(e){}
  try{if(AQ_LOG_URL&&navigator.sendBeacon)navigator.sendBeacon(AQ_LOG_URL,JSON.stringify({p:'alga',q:String(q).slice(0,300)}))}catch(e){}}
 function aqSmart(q){var t=aqNorm(q);
