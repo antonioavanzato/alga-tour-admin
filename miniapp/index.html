@@ -604,7 +604,8 @@ var aqLock=mkLock();
 var AQUICK=['Экскурсии и цены','Китовая акула','Резорты на день','Авторский тур','Дайвинг','Как оплатить','Отмена','Нужна виза?'];
 
 /* поиск: корень ищется с начала слова; k — тема (вес = длина), w — общие слова (вес 1), req — обязательные слова */
-function aqNorm(t){return (' '+String(t).toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я0-9₽$ .]/g,' ').replace(/\s+/g,' ')+' ')}
+function aqNorm(t){return aqSyn(aqNorm0(t))}
+function aqNorm0(t){return (' '+String(t).toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я0-9₽$ .]/g,' ').replace(/\s+/g,' ')+' ')}
 function dd(x){return String(x).replace(/(.)\1+/g,'$1')}
 function lev(a,b){var m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;var d=[],i,j;for(i=0;i<=m;i++)d[i]=[i];for(j=0;j<=n;j++)d[0][j]=j;for(i=1;i<=m;i++)for(j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
 function fz(q,k){var w=k.trim().split(' '),t=q.trim().split(' ');for(var s=0;s+w.length<=t.length;s++){var ok=true;for(var i=0;i<w.length&&ok;i++){var r=w[i],x=t[s+i],tol=r.length<6?0:(r.length<9?1:2);if(!tol){if(x.indexOf(r)!==0)ok=false}else{var b=9;for(var L=r.length-1;L<=r.length+1;L++){var v=lev(x.slice(0,L),r);if(v<b)b=v}if(b>tol)ok=false}}if(ok)return true}return false}
@@ -646,11 +647,61 @@ function aqRank(q,n){var t=dd(aqNorm(q)),r=[];aqArr().forEach(function(f){var s=
 function aqParts(q){return String(q).split(/[?!;]+|\.\s|,\s*(?=(?:а|и|and)\s)|\s(?:а также|и ещё|и еще|плюс|ещё вопрос|еще вопрос|and also|also|и|and)\s(?=(?:как|какая|какой|какие|сколько|можно|когда|где|есть|нужн|что|а|how|what|is|are|can|do|when|where)\s)/i).map(function(x){return x.trim()}).filter(function(x){return x.split(/\s+/).length>=2})}
 function aqFollow(t){return /^ (а|и|ну а|ну|and|what about|how about) /.test(t)||t.trim().split(' ').length<=3}
 function aqCtxPick(pq,q,ex){var c=pq+' '+q,tc=dd(aqNorm(c)),tp=dd(aqNorm(pq)),tq=dd(aqNorm(q)),r=aqRank(c,12);for(var i=0;i<r.length;i++){var f=r[i].f;if(f.id===ex||r[i].s<3)continue;var sc=aqSc(f,tc);if(sc>aqSc(f,tp)&&sc>aqSc(f,tq))return f}return null}
+/*aqEngine v5 (ALGA): синонимы, калькулятор, уточнение, журнал промахов*/
+var AQ_ENGINE='5.0';
+var AQSYN=[['скок','сколько'],['скока','сколько'],['сколька','сколько'],['почем','сколько стоит'],['китовух','китовая акула'],['экскурсух','экскурсия'],['резик','резорт'],['резорд','резорт'],['мафуши','маафуши'],['маффуши','маафуши'],['тг','телеграм'],['телег','телеграм'],['ватсап','whatsapp'],['вотсап','whatsapp'],['бакс','доллар'],['долар','доллар'],
+ ['hw','how'],['u','you'],['r','are'],['pls','please'],['plz','please'],['mafushi','maafushi'],['whaleshark','whale shark']];
+function aqSyn(t){var w=t.trim().split(' '),add=[];w.forEach(function(x){AQSYN.forEach(function(p){var hit=p[0].length<=3?x===p[0]:x.indexOf(p[0])===0;if(hit&&x!==p[1]&&(t+add.join(' ')+' ').indexOf(' '+p[1]+' ')<0)add.push(p[1])})});return add.length?t+'~ '+add.join(' ')+' ':t}
+var AQITEMS=[
+ {re:/ (китов|whale)/,n:['Китовая акула','Whale shark'],a:110,k:70,ka:['3–10 лет','3–10'],z:0},
+ {re:/ (аквариум|aquarium)/,n:['«Аквариум»','Aquarium'],a:80,k:60,ka:['до 10 лет','under 10'],z:3},
+ {re:/ (half|халф|полдня|пол дня|черепах|turtle)/,n:['Half Day','Half Day'],a:35,k:25,ka:['3–10 лет','3–10'],z:0},
+ {re:/ (акул|shark|дельфин|dolphin)/,n:['Акулы, коса, дельфины и скаты','Sharks, sandbank, dolphins & rays'],a:65,k:40,ka:['3–10 лет','3–10'],z:3},
+ {re:/ (сан сиям|sun siyam|siyam|сиям|олувели|olhuveli)/,n:['Sun Siyam (день на резорте)','Sun Siyam (resort day)'],a:145,k:85,ka:['2–12 лет','2–12'],z:2},
+ {re:/ (адаран|adaaran|ranhali|ранхали)/,n:['Adaaran (день на резорте)','Adaaran (resort day)'],a:130,k:90,ka:['2–12 лет','2–12'],z:2},
+ {re:/ (фихал|fihal)/,n:['Fihalhohi (день на резорте)','Fihalhohi (resort day)'],a:130,k:90,ka:['2–12 лет','2–12'],z:2},
+ {re:/ (центар|centara|ras fushi|рас фуши)/,n:['Centara Ras Fushi','Centara Ras Fushi'],a:160,k:-1,ka:['',''],z:0}];
+var AQNUM={'один':1,'одна':1,'одного':1,'два':2,'две':2,'двое':2,'двоих':2,'три':3,'трое':3,'троих':3,'четыре':4,'четверо':4,'четверых':4,'пять':5,'пятеро':5,'пятерых':5,'шесть':6,'шестеро':6,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6};
+function aqNum(x){return /^\d{1,2}$/.test(x)?+x:(AQNUM[x]||0)}
+function aqUsd(n){return '$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function aqCalc(q){var t=aqNorm0(q),en=aqEn(),it=null,i;for(i=0;i<AQITEMS.length;i++){if(AQITEMS[i].re.test(t)){it=AQITEMS[i];break}}if(!it)return null;
+ if(/ (приват|private|индивидуал)/.test(t))return null;
+ var w=t.trim().split(' '),ad=0,kd=0,ages=[];
+ for(var j=0;j<w.length;j++){var n=aqNum(w[j]),nx=w[j+1]||'';if(!n)continue;
+  if(/^(взросл|чел|человек|adult|people|person|pax|нас|гост|guest)/.test(nx))ad+=n;
+  else if(/^(реб|дет|kid|child|малыш|son|daughter)/.test(nx))kd+=n;
+  else if(/^(год|лет|year|yo)/.test(nx))ages.push(n)}
+ if(!ad&&/ (вдвоем|на двоих|for two|for 2|couple of us) /.test(t))ad=2;if(!ad&&/ (втроем|на троих|for three) /.test(t))ad=3;if(!ad&&/ (вчетвером|на четверых) /.test(t))ad=4;
+ if(!ad){for(var j2=0;j2<w.length;j2++){if(/^(двоих|вдвоем|троих|втроем|четверых|вчетвером)$/.test(w[j2])){ad=/^(дво|вдв)/.test(w[j2])?2:/^(тро|втр)/.test(w[j2])?3:4;break}}}
+ if(!ad&&!kd)return null;
+ if(!kd&&/ (ребен|ребён|дочк|дочер|сын|kid|child|son |daughter)/.test(t))kd=1;
+ if(kd&&it.k<0)return {id:'calc',a:en?'Centara Ras Fushi is adults only (18+) — children cannot visit. Sun Siyam, Adaaran and Fihalhohi welcome kids.':'Centara Ras Fushi — только для гостей от 18 лет, с детьми нельзя. С детьми подойдут Sun Siyam, Adaaran или Fihalhohi.',go:'res',gl:en?'Resorts':'Резорты'};
+ if(!ad&&kd)ad=/ (мы |we )/.test(t)?2:1;
+ if(ad+kd<2)return null;
+ var L=[],sum=0,note=[];
+ if(ad){L.push('• '+ad+(en?' adult'+(ad>1?'s':''):(ad>1?' взрослых':' взрослый'))+' × '+aqUsd(it.a)+' = '+aqUsd(ad*it.a));sum+=ad*it.a}
+ if(kd){if(it.k<0)return {id:'calc',a:en?'Centara Ras Fushi is adults only (18+) — children cannot visit. Sun Siyam, Adaaran and Fihalhohi welcome kids.':'Centara Ras Fushi — только для гостей от 18 лет, с детьми нельзя. С детьми подойдут Sun Siyam, Adaaran или Fihalhohi.',go:'res',gl:en?'Resorts':'Резорты'};
+  var fr=0,pk=0,young=0;for(var a=0;a<kd;a++){var g=ages[a];if(g!==undefined&&it.z&&g<it.z)fr++;else{pk++;if(g!==undefined&&!it.z&&g<3)young=1}}
+  if(pk){L.push('• '+pk+(en?' kid'+(pk>1?'s':'')+' ('+it.ka[1]+')':(pk>1?' ребёнка':' ребёнок')+' ('+it.ka[0]+')')+' × '+aqUsd(it.k)+' = '+aqUsd(pk*it.k));sum+=pk*it.k}
+  if(fr)L.push('• '+fr+(en?' kid'+(fr>1?'s':'')+' under '+it.z+' — free':(fr>1?' ребёнка':' ребёнок')+' до '+it.z+' лет — бесплатно'));
+  if(young)note.push(en?'Price for kids under 3 — please check with the manager.':'Цену для малышей до 3 лет уточните у менеджера.')}
+ return {id:'calc',a:(en?'Estimate — '+it.n[1]+':\n':'Расчёт — '+it.n[0]+':\n')+L.join('\n')+(en?'\nTotal: ':'\nИтого: ')+aqUsd(sum)+(en?' (all taxes and fees included).':' (все таксы и сборы включены).')+(note.length?'\n'+note.join(' '):'')+(en?'\nThe manager will confirm the final amount and dates.':'\nТочную сумму и даты подтвердит менеджер.'),go:'mgr',gl:en?'Message the manager':'Написать менеджеру'}}
+function aqClar(q,f){if(!f)return null;var r=aqRank(q,4);if(r.length<2)return null;var a=r[0],b=r[1];
+ if(a.s!==b.s||a.s<5||a.f.id===b.f.id)return null;if(a.f!==f&&b.f!==f)return null;
+ var dm=function(id){return /^(r_|rf_|res)/.test(id)?'r':/^(w_|weather)/.test(id)?'w':/^(whale|sharks|aqua|half|male|exc|x_|an_|dv_|dive|priv)/.test(id)?'e':'o'};
+ var da=dm(a.f.id),db=dm(b.f.id);if(da===db||da==='o'||db==='o')return null;
+ var t=aqNorm0(q);if(/ (резорт|отел|resort|hotel|погод|weather|дожд|rain|экскурс|trip|tour|снорк|snork|акул|shark|китов|whale)/.test(t))return null;
+ if(!aqLbl(a.f.id)||!aqLbl(b.f.id))return null;return [a.f,b.f]}
+var AQ_LOG_URL='';
+function aqLog(q){try{var k='alga_miss',a=JSON.parse(localStorage.getItem(k)||'[]');a.push({q:String(q).slice(0,300),d:new Date().toISOString().slice(0,10),en:aqEn()?1:0});localStorage.setItem(k,JSON.stringify(a.slice(-100)))}catch(e){}
+ try{if(AQ_LOG_URL&&navigator.sendBeacon)navigator.sendBeacon(AQ_LOG_URL,JSON.stringify({p:'alga',q:String(q).slice(0,300)}))}catch(e){}}
 function aqSmart(q){var t=aqNorm(q);
  if(AQACK.indexOf(t.trim())>=0)return {ack:1,list:[]};
+ var cc=aqCalc(q);if(cc)return {list:[cc]};
  var f=aqFind(q);
  var cq='';if(aqCtx.q&&aqFollow(t)){var g=(aqCtx.lq&&aqCtx.lq!==aqCtx.q?aqCtxPick(aqCtx.lq,q,aqCtx.id):null)||aqCtxPick(aqCtx.q,q,aqCtx.id);if(g){f=g;cq=1}}
  var ps=aqParts(q);if(ps.length>=2){var ids={},list=[];var pid='';ps.forEach(function(p,i){var h=aqFind(p);if(i){var g=aqCtxPick(ps[i-1],p,pid);if(g)h=g}pid=h?h.id:'';if(h&&!ids[h.id]){ids[h.id]=1;list.push(h)}});if(list.length>=2)return {list:list.slice(0,3)}}
+ if(!cq){var cl=aqClar(q,f);if(cl)return {list:[],clar:cl}}
  return {list:f?[f]:[],cq:cq}}
 function aqLbl(id){var m=aqEn()?AQL_EN:AQL;return m[id]||''}
 function aqRel(q,ex){var out=[],seen={};function add(id){var l=aqLbl(id);if(l&&id!==ex&&!seen[id]&&out.length<4){seen[id]=1;out.push(l)}}
@@ -662,8 +713,10 @@ function aqChips(ls){if(!ls.length)return;var d=document.createElement('div');d.
 function aqAnswer(q){q=String(q||'').trim();if(!q)return;aqLast=q;aqMsg('u',q);try{aqTg().HapticFeedback.selectionChanged()}catch(e){}
  var ty=aqMsg('a t','• • •');setTimeout(function(){ty.remove();var r=aqSmart(q);
   if(r.ack){aqMsg('a',aqTx('Отлично! Если появятся ещё вопросы — спрашивайте, я здесь 🙂','Great! If you have more questions — just ask, I’m here 🙂'));return}
+  if(r.clar){aqMsg('a',aqTx('Уточните, пожалуйста, вы про:','Just to check — do you mean:'));aqChips(r.clar.map(function(f){return aqLbl(f.id)}));return}
   if(r.list.length===1&&r.list[0].id===aqCtx.id){aqMsg('a',aqTx('Об этом я рассказал чуть выше 👆 Возможно, вас интересует:','I covered that just above 👆 Maybe you’re interested in:'));aqChips(aqRel(q,aqCtx.id));aqCtx.q=q;return}
   if(r.list.length){r.list.forEach(function(f){aqMsg('a',f.a,f.go,f.gl)});aqCtx={q:r.cq?aqCtx.q:q,lq:q,id:r.list[r.list.length-1].id};return}
+  aqLog(q);
   var s=aqRel(q,'');
   if(s.length){aqMsg('a',aqTx('Не совсем понял вопрос 🤔 Возможно, вы имели в виду:','I didn’t quite get it 🤔 Did you mean:'));aqChips(s);aqMsg('a',aqTx('Или напишите менеджеру ALGA — ответим примерно за 15 минут, на связи 24/7.','Or message an ALGA manager — we reply in about 15 minutes, 24/7.'),null,aqTx('Написать менеджеру','Message a manager'),aqToMgr)}
   else aqMsg('a',aqTx('Не нашёл готового ответа на этот вопрос. Напишите менеджеру ALGA — ответим в течение ~15 минут, на связи 24/7.','I don’t have a ready answer to that. Message an ALGA manager — we reply in about 15 minutes, 24/7.'),null,aqTx('Написать менеджеру','Message a manager'),aqToMgr)},450)}
